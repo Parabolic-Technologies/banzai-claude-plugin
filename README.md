@@ -13,9 +13,6 @@ the agent to work from a spec and an approved plan instead.
 
 ![The approval dialog in a terminal: it quotes four lines of the plan, names the file the answer approves, and offers Yes and No.](assets/approval-dialog.svg)
 
-The approval dialog, redrawn from a real session: the yellow lines come from
-the plan and name what your "Yes" covers.
-
 Banzai adds a workflow of five slash commands and one guardrail hook that
 asks you before source files change:
 
