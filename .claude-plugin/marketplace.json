@@ -10,7 +10,9 @@
     {
       "name": "banzai",
       "source": "./plugins/banzai",
-      "description": "Spec-driven work with a hook-held approval gate."
+      "description": "Spec-driven development with human-in-the-loop plan approval, guardrails for source edits, and an independent code review.",
+      "category": "development",
+      "tags": ["spec-driven-development", "human-in-the-loop", "workflow", "code-review", "guardrails"]
     }
   ]
 }

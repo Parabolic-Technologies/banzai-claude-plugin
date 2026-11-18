@@ -1,12 +1,24 @@
 {
   "name": "banzai",
   "version": "1.0.0",
-  "description": "Spec-driven work with a hook-held approval gate: five commands the developer types, a plan the developer approves with one click, and an independent review.",
+  "description": "Spec-driven development for Claude Code with a human in the loop: slash commands for requirements, plans and an independent code review, and a guardrail hook that holds Claude's file edits to source code until you approve the plan with one click.",
   "author": {
     "name": "Alexander Torosh",
     "email": "alexander@parabolic.io"
   },
   "homepage": "https://github.com/Parabolic-Technologies/banzai-claude-plugin",
   "repository": "https://github.com/Parabolic-Technologies/banzai-claude-plugin",
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "keywords": [
+    "spec-driven-development",
+    "human-in-the-loop",
+    "workflow",
+    "planning",
+    "code-review",
+    "guardrails",
+    "ai-coding",
+    "agentic-coding",
+    "hooks",
+    "skills"
+  ]
 }

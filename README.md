@@ -1,23 +1,37 @@
 # Banzai
 
-**Planned work in Claude Code that starts only after you approve the plan.**
+**Spec-driven development for Claude Code with a human in the loop: the AI
+agent writes the plan, you approve it with one click, then it writes the
+code.**
 
 [![CI](https://github.com/Parabolic-Technologies/banzai-claude-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/Parabolic-Technologies/banzai-claude-plugin/actions/workflows/ci.yml)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue)](LICENSE)
 
-Banzai is a plugin for Claude Code. It adds five commands that you type and
-one hook that asks you before source files change:
+Banzai is a Claude Code plugin for developers who want an AI coding agent to
+work from a spec and an approved plan. It adds a workflow of five slash
+commands and one guardrail hook that asks you before source files change:
 
-- a small change runs directly, after you type the command for it;
-- planned work gets a written plan, and Claude Code's file tools write no
-  source file until you approve that plan with one click;
-- a change made another way, through the shell or an MCP tool, is found after
-  the call and shown to you;
-- a finished change can be reviewed by a fresh reviewer that has not seen how
-  it was made.
+- **Quick fix.** A small change runs directly, after you type the command
+  for it.
+- **Plan approval.** Planned work gets written requirements and a plan, and
+  Claude Code's file tools write no source file until you approve that plan
+  with one click.
+- **Guardrails.** A change made another way, through the shell or an MCP
+  tool, is found after the call and shown to you.
+- **Independent code review.** A finished change can be reviewed by a fresh
+  subagent that has not seen how it was made.
 
 Requirements, plans, decisions, reports and reviews are ordinary Markdown
-files in your project.
+files in your project, so you can read, diff and commit them.
+
+Compared with Claude Code's plan mode: the plan is a file in your project,
+your approval is bound to that file's content, and it still holds in a new
+session.
+
+![The approval dialog in a terminal: it quotes four lines of the plan, names the file the answer approves, and offers Yes and No.](assets/approval-dialog.svg)
+
+The approval dialog, redrawn from a real session: the yellow lines come from
+the plan and name what your "Yes" covers.
 
 ## Requirements
 
