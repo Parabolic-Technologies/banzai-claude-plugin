@@ -56,11 +56,13 @@ section then states the requirements.
 
 ## 3. Design
 
-Take this step only when the work decides one of these: a data model
-(the format or the place of data kept between runs included), a public API,
-a new dependency, a security boundary, or a choice that many parts of the
-code will have to follow. Guide: `steps/design.md`. The
-developer accepts the decision record before the plan is written.
+Take this step only when the work decides something that is costly to
+reverse: a data model (the format or the place of data kept between runs
+included), a public API, a new dependency, a security boundary, or a choice
+that many parts of the code will have to follow. A choice of these kinds
+that is cheap to undo needs no record; the plan's "For approval" section
+names it. Guide: `steps/design.md`. The developer accepts the decision
+record before the plan is written.
 
 ## 4. Plan
 
@@ -88,7 +90,9 @@ Do not change source files before the developer has answered "Yes".
 
 - "Yes": the command returns and the hook says the work is approved. Go on.
 - "No": your turn ends there. The developer's next message says what to
-  change; change the plan and run the command again.
+  change; change the plan and run the command again. When that message does
+  not say what to change, ask; do not show the dialog again for a plan that
+  has not changed.
 - The command comes back refused: read the hook's message. "Approval
   requested" means that nobody answered the dialog. The work is not
   approved, so stop and say that the plan waits for the developer's

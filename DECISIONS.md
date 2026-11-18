@@ -26,9 +26,11 @@ allows no source write until a plan exists and is approved. With no entry
 command, every source write asks, and a "Yes" covers that one change. In a
 headless run the entry command counts as the consent of whoever launched it.
 Reason: the prompt-submit event also fires for scheduled prompts and task
-notifications, and a model cannot invoke these skills, so the expansion event
-is the one signal that a human chose the command. A "Yes" on a write dialog
-cannot unlock the session, because that dialog hides the hook's text.
+notifications. The host lets a model start these skills only when the
+developer's message names the command with its slash, and such a start
+raises no expansion event. So the expansion event is the one signal that a
+human chose the command. A "Yes" on a write dialog cannot unlock the session,
+because that dialog hides the hook's text.
 Rejected: reading the prompt text; one "Yes" on a write unlocking the session.
 
 ## 2026-11-17: Planned work outranks the session approval

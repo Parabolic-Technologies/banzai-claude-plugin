@@ -119,7 +119,7 @@ function onSessionStart(payload, root, session) {
   const here = session.work ? `attached to work "${session.work}"` : session.entry ? `started with /banzai:${session.entry}` : 'no entry command typed yet';
   return context('SessionStart', [
     'This project uses the banzai plugin: source changes need the developer\'s go-ahead.',
-    '- The developer starts work by typing /banzai:fix <request> for a small direct change, or /banzai:feature <request or work name> for planned work. You cannot invoke these commands. Without one, each source change asks the developer.',
+    '- The developer starts work by typing /banzai:fix <request> for a small direct change, or /banzai:feature <request or work name> for planned work. Only a command the developer typed counts; one you start through the Skill tool does not. Without one, each source change asks the developer.',
     `- Planned work has a plan at documentation/work/<work>/plan.md. After writing or changing it, show the developer the approval dialog by running exactly this shell command, alone: ${approvalCommand('<work>')}`,
     '- Source changes made through the shell or other tools are compared before and after, and unapproved ones are shown to the developer in the dialog of the next shell command.',
     '- The developer can also type /banzai:review <work> for an independent review and /banzai:epic for large work split into packages. Always name a command in full; a bare /review is a different command.',
