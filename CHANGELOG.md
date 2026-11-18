@@ -4,6 +4,17 @@ All notable changes to the Banzai plugin are listed here. Versions follow
 [Semantic Versioning](https://semver.org/). A change to a command name, to
 the hook's decisions or to the document layout is a breaking change.
 
+## 1.0.1 - 2026-11-18
+
+### Changed
+
+- At session start the hook tells Claude that only a typed command counts,
+  not one started through the Skill tool.
+- `/banzai:feature` records only decisions that are costly to reverse, and
+  asks what to change when a "No" does not say, instead of showing the same
+  plan again.
+- An icon, keywords and fuller descriptions in the plugin listing.
+
 ## 1.0.0 - 2026-11-18
 
 The first version of the plugin. It needs Claude Code 2.1.327 or later and
