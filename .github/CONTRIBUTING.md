@@ -54,7 +54,7 @@ The project keeps itself small on purpose. These limits are part of the design:
 - the hook and its helper: about 800 lines of plain `.mjs`, with no dependency;
 - all tests: under 30 seconds;
 - all skill text: about 1,500 lines;
-- one [DECISIONS.md](DECISIONS.md) for decisions that are costly to reverse or
+- one [DECISIONS.md](../DECISIONS.md) for decisions that are costly to reverse or
   not obvious: the decision, the reason and what was rejected.
 
 A change that needs more room removes something else or explains why the limit
@@ -85,7 +85,7 @@ limits; model output is not independent verification by itself.
 
 Unless you explicitly state otherwise, contributions intentionally submitted
 for inclusion are offered under Apache-2.0, as described in section 5 of
-[LICENSE](LICENSE). You or the applicable copyright holder retain ownership of
+[LICENSE](../LICENSE). You or the applicable copyright holder retain ownership of
 your contribution. No copyright assignment is required. Submit only material you
 have the right to license, and identify third-party material with its source,
 license, and required notices. Discuss a different license before submitting

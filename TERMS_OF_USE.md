@@ -59,7 +59,7 @@ Subscriptions, accounts, availability, usage limits, charges, and data handling
 for Claude Code are governed by its provider. Apache-2.0 does not grant access
 to that service. The Banzai maintainers do not operate it or control its
 retention policies. Do not include secrets or private project material in
-public issues; see [SECURITY.md](SECURITY.md).
+public issues; see [SECURITY.md](.github/SECURITY.md).
 
 ## Warranty, liability, and support
 
@@ -76,6 +76,6 @@ is required for any additional support or warranty commitment.
 
 Trademark rights are separate from copyright licensing; see
 [TRADEMARKS.md](TRADEMARKS.md). Participation in project spaces follows the
-[Code of Conduct](CODE_OF_CONDUCT.md), and contributions follow
-[CONTRIBUTING.md](CONTRIBUTING.md). Community moderation does not revoke
+[Code of Conduct](.github/CODE_OF_CONDUCT.md), and contributions follow
+[CONTRIBUTING.md](.github/CONTRIBUTING.md). Community moderation does not revoke
 software rights already granted under Apache-2.0.

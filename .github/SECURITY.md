@@ -31,8 +31,8 @@ call, and binds an approval to the content of the approved files. It guards agai
 model that starts to write code before the plan was read, or a plan that
 changed after it was approved. It is not an operating-system sandbox, and it
 is not protected against a model or a process that works to get around it.
-The known limits are listed in [DECISIONS.md](DECISIONS.md) and in the
-[README](README.md#limits).
+The known limits are listed in [DECISIONS.md](../DECISIONS.md) and in the
+[README](../README.md#limits).
 
 A way to get around the gate on purpose is therefore a known limit, not a
 vulnerability. Please do report, privately:

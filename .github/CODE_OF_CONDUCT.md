@@ -27,4 +27,4 @@ reconsideration through the same contact address. No response deadline is
 promised.
 
 This policy governs participation in community spaces; it does not change the
-[software license](LICENSE).
+[software license](../LICENSE).

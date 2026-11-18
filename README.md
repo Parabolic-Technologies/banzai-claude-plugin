@@ -7,19 +7,27 @@ code.**
 [![CI](https://github.com/Parabolic-Technologies/banzai-claude-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/Parabolic-Technologies/banzai-claude-plugin/actions/workflows/ci.yml)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue)](LICENSE)
 
-Banzai is a Claude Code plugin for developers who want an AI coding agent to
-work from a spec and an approved plan. It adds a workflow of five slash
-commands and one guardrail hook that asks you before source files change:
+An AI coding agent tends to start writing code before you have agreed on
+what it should build. Banzai is a Claude Code plugin for developers who want
+the agent to work from a spec and an approved plan instead.
 
-- **Quick fix.** A small change runs directly, after you type the command
-  for it.
-- **Plan approval.** Planned work gets written requirements and a plan, and
-  Claude Code's file tools write no source file until you approve that plan
-  with one click.
-- **Guardrails.** A change made another way, through the shell or an MCP
-  tool, is found after the call and shown to you.
-- **Independent code review.** A finished change can be reviewed by a fresh
-  subagent that has not seen how it was made.
+![The approval dialog in a terminal: it quotes four lines of the plan, names the file the answer approves, and offers Yes and No.](assets/approval-dialog.svg)
+
+The approval dialog, redrawn from a real session: the yellow lines come from
+the plan and name what your "Yes" covers.
+
+Banzai adds a workflow of five slash commands and one guardrail hook that
+asks you before source files change:
+
+- **Plan approval** with `/banzai:feature`. Planned work gets written
+  requirements and a plan, and Claude Code's file tools write no source file
+  until you approve that plan with one click.
+- **Guardrails.** A change through the shell or an MCP tool cannot be
+  stopped beforehand; it is found after the call and shown to you.
+- **Independent code review** with `/banzai:review`. A finished change can
+  be reviewed by a fresh subagent that has not seen how it was made.
+- **Quick fix** with `/banzai:fix`. A small change needs no plan: you type
+  the command and it runs directly.
 
 Requirements, plans, decisions, reports and reviews are ordinary Markdown
 files in your project, so you can read, diff and commit them.
@@ -27,11 +35,6 @@ files in your project, so you can read, diff and commit them.
 Compared with Claude Code's plan mode: the plan is a file in your project,
 your approval is bound to that file's content, and it still holds in a new
 session.
-
-![The approval dialog in a terminal: it quotes four lines of the plan, names the file the answer approves, and offers Yes and No.](assets/approval-dialog.svg)
-
-The approval dialog, redrawn from a real session: the yellow lines come from
-the plan and name what your "Yes" covers.
 
 ## Requirements
 
@@ -72,10 +75,21 @@ Then start Claude Code in the project and type:
 - offers to record the project's build, test, lint and format commands in
   your `CLAUDE.md`, and asks before it writes them.
 
-Commit these files so that your team shares them. The settings make the
-marketplace known to a teammate's Claude Code but install nothing. Each
-teammate opens the project in Claude Code once and trusts the folder, which
-fetches the marketplace, and then runs the install command above.
+Now give it a first piece of work in your own words, for example:
+
+```text
+/banzai:feature add a --shout flag to the greet CLI
+```
+
+The model writes a plan and shows the approval dialog. After your "Yes" it
+writes the code and the tests.
+
+### For a team
+
+Commit the files `setup` wrote so that your team shares them. The settings
+make the marketplace known to a teammate's Claude Code but install nothing.
+Each teammate opens the project in Claude Code once and trusts the folder,
+which fetches the marketplace, and then runs the install command above.
 
 ## Commands
 
@@ -87,9 +101,13 @@ You type every command yourself; the model cannot start one.
 | `/banzai:fix <what to change>`    | A small, direct change with no plan.                              |
 | `/banzai:feature <what to build>` | Planned work: plan, your approval, code, tests, report.           |
 | `/banzai:review [work]`           | An independent review of a finished change.                       |
-| `/banzai:epic <mode>`             | Large work split into stages and packages: `start`, `next`, `record`, `gate`. |
+| `/banzai:epic <mode>`             | Work too large for one plan; see [Large work](#large-work).       |
 
 Always type the full name. A bare `/review` is a different command.
+
+A *work* is one change with its own directory,
+`documentation/work/<work>/`. Its name is the date and the subject, such as
+`261118-greet-shout-flag`, and that name is what `[work]` stands for.
 
 ## How planned work goes
 
@@ -97,15 +115,13 @@ Always type the full name. A bare `/review` is a different command.
 2. When the request leaves open what users get, the model asks you up to
    three questions, each with the answer it recommends. It decides matters
    of form itself, such as names and messages, and marks each such choice.
-3. The model writes `documentation/work/<work>/plan.md`. A larger request
+3. The model writes `plan.md` in the work's directory. A larger request
    first gets `requirements.md`, and a choice that is costly to reverse gets
    a decision record under `documentation/decisions/`, which you accept in
    chat before the plan is written.
-4. An approval dialog appears. It shows the plan's "For approval" section: up
-   to five lines of at most 72 characters that say what will be built and
-   name each choice the model made for you. It also names the files your
-   answer approves; when that list is long, the terminal folds its end out
-   of view.
+4. An approval dialog appears. It quotes the plan's "For approval" section,
+   which says what will be built and names each choice the model made for
+   you, and it names the files your answer approves.
 5. "Yes" approves exactly those files as they are. If one of them changes
    later, the approval ends and the dialog comes again.
 6. The model writes the code and the tests, runs the project's checks and
@@ -113,8 +129,36 @@ Always type the full name. A bare `/review` is a different command.
 7. `/banzai:review <work>` starts a reviewer with fresh context and writes
    `review.md`. A review changes no source file; you choose what to fix.
 
+When the work is done, your project holds:
+
+```text
+documentation/
+├── decisions/                decision records
+└── work/
+    └── 261118-greet-shout-flag/
+        ├── requirements.md   what must be true when it is done
+        ├── plan.md           how it will be built
+        ├── report.md         what was built and how it was checked
+        └── review.md         what the reviewer found
+```
+
 To continue a work in a new session, type `/banzai:feature <work>`. An
 approval of unchanged files still holds.
+
+## Large work
+
+`/banzai:epic` keeps track of work that is too large for one plan. You split
+it into stages and packages yourself, and each package is then built with
+its own `/banzai:feature` or `/banzai:fix`. The command keeps the epic's
+plan, tracker and log in `documentation/epics/<epic>/` and changes no source
+file.
+
+| Mode              | What it does                                                        |
+| ----------------- | ------------------------------------------------------------------- |
+| `start <subject>` | Stores your plan and creates the tracker and the log.               |
+| `next`            | Reports where the epic stands and names the next package to build.  |
+| `record <entry>`  | Records a started or finished package, a question or a decision.    |
+| `gate <N>`        | Lists the evidence for a stage's gate; you decide whether it passed. |
 
 ## What the hook holds back
 
@@ -137,18 +181,26 @@ too.
   "No" does not undo the change: revert it yourself. Until you accept it,
   each shell command asks again and MCP calls are refused.
 
-The hook behaves the same in every permission mode, `bypassPermissions`
-included. To work without it, disable the plugin:
+The approval dialog shows up to five lines of at most 72 characters from the
+plan's "For approval" section. When the list of approved files is long, the
+terminal folds its end out of view.
 
-```bash
-claude plugin disable banzai@parabolic-plugins
-```
+The hook behaves the same in every permission mode, `bypassPermissions`
+included.
 
 In a run with nobody to answer (`claude -p`), every question of the hook is
 refused. `/banzai:fix` still works. A plan cannot be approved, a run with no
 command typed cannot change a source file with the file tools, and after a
 change through the shell is found, the run's later shell and MCP calls are
 refused.
+
+## Disable or uninstall
+
+To work without the hook, disable the plugin:
+
+```bash
+claude plugin disable banzai@parabolic-plugins
+```
 
 Approval records are kept in `.banzai/approvals/` in the project, outside
 Git. Losing them costs one new click per work. Uninstalling the plugin
@@ -177,8 +229,9 @@ what was rejected.
 
 Report reproducible problems through
 [GitHub Issues](https://github.com/Parabolic-Technologies/banzai-claude-plugin/issues).
-To contribute, read [Contributing](CONTRIBUTING.md). Report vulnerabilities
-through the [security policy](SECURITY.md). Changes are listed in the
+To contribute, read [Contributing](.github/CONTRIBUTING.md). Report
+vulnerabilities through the [security policy](.github/SECURITY.md). Changes
+are listed in the
 [changelog](CHANGELOG.md).
 
 ## Author and license
@@ -192,4 +245,4 @@ Banzai is licensed under the [Apache License, Version 2.0](LICENSE).
 See [NOTICE](NOTICE), [third-party information](THIRD_PARTY_NOTICES.md),
 [Terms of Use](TERMS_OF_USE.md), and [Names and Logos](TRADEMARKS.md).
 Using Banzai does not require open-sourcing your own project. Community
-participation follows the [Code of Conduct](CODE_OF_CONDUCT.md).
+participation follows the [Code of Conduct](.github/CODE_OF_CONDUCT.md).
