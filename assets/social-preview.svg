@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" width="1280" height="640" role="img" aria-labelledby="t d">
+<title id="t">Banzai, a Claude Code plugin</title>
+<desc id="d">Spec-driven development with a human in the loop. Below, the approval dialog quotes the plan, names the file plan.md that the answer approves, and offers Yes and No.</desc>
+<defs>
+<linearGradient id="accent" x1="0" x2="1" y1="0" y2="0">
+<stop offset="0" stop-color="#1b3fa8"/><stop offset="0.55" stop-color="#6a1ee6"/><stop offset="1" stop-color="#d400ff"/>
+</linearGradient>
+<clipPath id="icon"><rect x="81" y="57" width="86" height="86" rx="21"/></clipPath>
+</defs>
+<rect width="1280" height="640" fill="#0d1117"/>
+<rect width="1280" height="8" fill="url(#accent)"/>
+<image href="../plugins/banzai/.claude-plugin/icon.png" x="55.5" y="31.5" width="137" height="137" clip-path="url(#icon)"/>
+<g font-family="-apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif">
+<text x="192" y="129" font-size="84" font-weight="700" fill="#f0f6fc">Banzai</text>
+<rect x="912" y="76" width="288" height="48" rx="24" fill="none" stroke="#afd7ff" stroke-opacity="0.55" stroke-width="1.5"/>
+<text x="1056" y="109" font-size="26" font-weight="500" fill="#afd7ff" text-anchor="middle">Claude Code plugin</text>
+<text x="80" y="200" font-size="38" font-weight="600" fill="#f0f6fc">Spec-driven development with a human in the loop</text>
+<text x="80" y="244" font-size="26" fill="#9198a1">The agent writes the plan · you approve it with one click · then it writes the code</text>
+</g>
+<rect x="80.75" y="276.75" width="1118.5" height="302.5" rx="12" fill="#010409" stroke="#30363d" stroke-width="1.5"/>
+<path d="M81.5 289a11.5 11.5 0 0 1 11.5-11.5h1094a11.5 11.5 0 0 1 11.5 11.5v22.5H81.5z" fill="#161b22"/>
+<circle cx="104" cy="294.5" r="6" fill="#ff5f57"/><circle cx="125" cy="294.5" r="6" fill="#febc2e"/><circle cx="146" cy="294.5" r="6" fill="#28c840"/>
+<g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="24" xml:space="preserve">
+<text x="108" y="350" fill="#949494">│</text>
+<text x="132" y="350" fill="#ffd700">Approval requested for work "261118-greet-shout-flag". Its plan says:</text>
+<text x="108" y="382" fill="#949494">│</text>
+<text x="132" y="382" fill="#ffd700">Adds --shout to the greet CLI: prints the greeting in upper case.</text>
+<text x="108" y="414" fill="#949494">│</text>
+<text x="132" y="414" fill="#ffd700">"Yes" approves these files, until one changes:</text>
+<text x="108" y="446" fill="#949494">│</text>
+<text x="132" y="446" fill="#ffd700">documentation/work/261118-greet-shout-flag/plan.md</text>
+<text x="108" y="492" fill="#d0d0d0">Do you want to proceed?</text>
+<text x="108" y="524" fill="#afd7ff">❯</text>
+<text x="132" y="524" fill="#949494">1.</text>
+<text x="176" y="524" fill="#afd7ff">Yes</text>
+<text x="132" y="556" fill="#949494">2.</text>
+<text x="176" y="556" fill="#d0d0d0">No</text>
+</g>
+</svg>
