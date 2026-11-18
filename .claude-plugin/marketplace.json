@@ -1,0 +1,16 @@
+{
+  "name": "parabolic-plugins",
+  "owner": {
+    "name": "Parabolic Technologies, Inc."
+  },
+  "metadata": {
+    "description": "Plugins by Parabolic Technologies, Inc."
+  },
+  "plugins": [
+    {
+      "name": "banzai",
+      "source": "./plugins/banzai",
+      "description": "Spec-driven work with a hook-held approval gate."
+    }
+  ]
+}

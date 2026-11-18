@@ -1,0 +1,12 @@
+{
+  "name": "banzai",
+  "version": "1.0.0",
+  "description": "Spec-driven work with a hook-held approval gate: five commands the developer types, a plan the developer approves with one click, and an independent review.",
+  "author": {
+    "name": "Alexander Torosh",
+    "email": "alexander@parabolic.io"
+  },
+  "homepage": "https://github.com/Parabolic-Technologies/banzai-claude-plugin",
+  "repository": "https://github.com/Parabolic-Technologies/banzai-claude-plugin",
+  "license": "Apache-2.0"
+}

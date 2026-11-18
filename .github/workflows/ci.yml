@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    container: node:26.13.1-bookworm
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - run: npm test
+      # The Claude Code version the README names as the oldest supported one.
+      # Validation needs no account.
+      - run: npm install --global @anthropic-ai/claude-code@2.1.327
+      - run: claude plugin validate .
+      - run: claude plugin validate plugins/banzai
