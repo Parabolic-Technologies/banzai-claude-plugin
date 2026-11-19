@@ -4,6 +4,15 @@ All notable changes to the Banzai plugin are listed here. Versions follow
 [Semantic Versioning](https://semver.org/). A change to a command name, to
 the hook's decisions or to the document layout is a breaking change.
 
+## 1.0.5 - 2026-11-19
+
+### Changed
+
+- `/banzai:review` stays inside the working copy. The reviewer runs local
+  checks only and calls no external or deployed system. Claims that need
+  one are listed as not checked, and you are asked before any live check.
+  Name the systems in the request to allow live checks from the start.
+
 ## 1.0.4 - 2026-11-19
 
 ### Added

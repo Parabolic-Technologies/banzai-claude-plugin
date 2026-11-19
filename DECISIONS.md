@@ -273,3 +273,18 @@ was drafted. The owner reads the stages after the files are written.
 Rejected: a draft file edited after every answer; an approval question
 before the files are written; dialogs without a limit; treating ignored files as free in the hook,
 because `.env` is one; a separate `draft` mode.
+
+## 2026-11-19: A review stays inside the working copy
+
+The reviewer reads the project's files and runs its local checks. It calls
+no external or deployed system, not even to read, and reads no credentials.
+A claim that can be checked only against such a system is listed as not
+checked; the session then asks the developer whether to check it live. The
+developer may allow live checks in the request by naming the systems.
+Reason: the brief said "read anything" and "run the checks again", and a
+subagent cannot ask the developer. Observed on a project whose report
+claimed a check on a staging stack: the reviewer queried the cloud account
+and read a chat token from `.env` to repeat that check, and the session had
+added the project's access rules to the brief on its own.
+Rejected: a question before the reviewer starts, which blocks every review;
+a list of forbidden tools in the hook.

@@ -19,6 +19,11 @@ the developer can act on, or with a clear pass.
 - Paths or a Git range: review that change. There is then no work directory
   and the review is reported in chat only.
 
+A review stays inside the working copy. It calls no external or deployed
+system (a cloud account, a chat or issue service, a remote database, a
+staging or production environment), not even to read, unless the developer
+allows live checks in the request and names the systems.
+
 Collect, without judging yet:
 
 - the intent: `requirements.md`, `plan.md`, the decision records the plan
@@ -34,14 +39,25 @@ Collect, without judging yet:
 Start one subagent with a fresh context and give it the brief below. Pass it
 paths and commands only. Do not pass your own summary of the change, your
 opinion of it or anything you learned while building it: the reviewer must
-reach its own conclusions. When no subagent tool is available, do the audit
-yourself and say in the review that it was not independent.
+reach its own conclusions. Add nothing that widens the brief. Only when the
+developer allowed live checks, add one line that names the allowed systems
+and says they are read-only. When no subagent tool is available, do the
+audit yourself and say in the review that it was not independent.
 
 Brief for the reviewer:
 
 > Review the change described by these files and commands: <list>. You may
-> read anything and run the project's checks. Do not change the project's
-> files; put any script you write in a temporary directory outside it.
+> read the project's files and run its local checks: the tests, linters,
+> type checks and builds that the project's documents name. Do not change
+> the project's files; put any script you write in a temporary directory
+> outside it.
+>
+> Stay inside the working copy. Do not call an external or deployed system
+> (a cloud account, a chat or issue service, a remote database, a staging
+> or production environment), not even to read, and do not read credentials
+> or secret files such as `.env`. When a claim can be checked only against
+> such a system, do not check it: list it under "Not checked" with the
+> system it needs.
 >
 > Audit:
 >
@@ -51,11 +67,11 @@ Brief for the reviewer:
 > 4. Correctness: failure paths, limits, empty and hostile input, concurrent
 >    use, and what happens when an operation is interrupted.
 > 5. Security: every trust boundary the change touches. Try the forbidden
->    thing.
+>    thing in a test or a scratch copy.
 > 6. Tests: they fail when the behaviour breaks, they cover what matters,
 >    and none was weakened or skipped.
 > 7. Report: its file list and verification claims match what you see. Run
->    the checks again.
+>    the local checks again.
 > 8. Fit: the change reuses what the project already has, adds no unused
 >    generality and leaves no fact stale in a document, `CLAUDE.md` or
 >    `AGENTS.md`.
@@ -63,7 +79,7 @@ Brief for the reviewer:
 > Report findings only. A finding needs all four: exact evidence (a command
 > with its output, or the quoted code), a location as `file:line`, the
 > impact, and the smallest fix. Reproduce a finding wherever it can be
-> reproduced. A preference, a style remark or a guess is not a finding.
+> reproduced locally. A preference, a style remark or a guess is not a finding.
 > Give each finding a severity: `blocker` (wrong result, lost data, a
 > security hole, a requirement not met), `major` (a defect in a case that
 > will occur) or `minor`. When you find nothing, say what you checked.
@@ -74,7 +90,8 @@ status, as a thing to check for closure.
 ## 3. Verify
 
 Check every finding yourself before it reaches the developer: run the
-reproduction, or read the code at the location. Drop a finding you cannot
+reproduction, or read the code at the location. The reviewer's limits bind
+you too: verify inside the working copy. Drop a finding you cannot
 confirm, and say that you dropped it. Do not soften a confirmed finding and
 do not add findings of your own without the same evidence.
 
@@ -90,6 +107,8 @@ section at the top and keeps the earlier ones.
 
 Reviewed: <the range, the files and the documents>. Independent: <yes | no>.
 
+Not checked: <each claim that needs a live system, with the system | nothing>.
+
 ### F1 · <severity> · <summary>
 
 - Location: `<file>:<line>`
@@ -103,7 +122,8 @@ Reviewed: <the range, the files and the documents>. Independent: <yes | no>.
 ```
 
 The verdict is `changes needed` when a blocker or a major finding is open,
-and `pass` otherwise. Findings are numbered through the whole file, so an
+and `pass` otherwise. A claim that was not checked is not a finding and
+does not change the verdict. Findings are numbered through the whole file, so an
 identifier never changes its meaning.
 
 A repeated review checks closure first: each earlier finding is closed,
@@ -118,3 +138,8 @@ Tell the developer the verdict and list the findings, worst first, each in
 one line with its location. Do not fix anything. The developer decides which
 findings to act on: `/banzai:fix <findings>` applies them, and
 `/banzai:feature <work>` is the way when a fix changes the plan.
+
+When claims were not checked, name each one with its system and ask the
+developer whether to check them live. Call no such system before the
+answer. After a yes, check them read-only and add the result to
+`review.md`.
