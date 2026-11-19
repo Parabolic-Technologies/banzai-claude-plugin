@@ -239,3 +239,37 @@ A new `CLAUDE.md` with a few commands would silently take the team's
 Rejected: always writing to `CLAUDE.md`; creating a `CLAUDE.md` that only
 imports `AGENTS.md`.
 
+## 2026-11-19: `epic start` plans a goal with the owner and writes the brief once
+
+Given a goal instead of a brief, `start` reads the code, asks what changes
+the scope, the order or the split in the host's question dialog, writes
+`brief.md`, the tracker and the log once, and then shows the plan in its
+reply. It asks for no approval before it writes: the owner changes the brief
+by saying what to change. The command writes only under
+`documentation/epics/`. A brief the owner brings is still stored as given.
+Reason: an owner rarely arrives with stages, gates and "Done when" items.
+In a session of 2026-11-19 the command showed the template and stopped, the
+model then kept a draft in an ignored directory outside `documentation/`,
+and the hook asked before each of ten writes to it, four for every answer
+the owner gave. Answers given in a dialog cost no write, and files under
+`documentation/` are outside the gate.
+Observed on Claude Code 2.1.328 with Opus 5.5, three interactive runs: told
+to show the plan before the question dialog, the model composed it in its
+reasoning, and the terminal showed one line of summary, so a question
+"create the epic from this plan?" asked about a plan nobody had seen. The
+reply at the end of the turn is always shown, so the plan goes there, after
+the files exist. A headless run asks in its reply and writes after the
+answers arrive.
+The host's dialog takes four questions, so the questions are ranked by how
+much of the plan each changes, and a second dialog may follow the first.
+Two dialogs, eight questions, are the limit: a detail of one package is
+asked later by that package's own `feature`, and asking about every open
+choice teaches the owner to answer without reading. Observed with a goal of
+seven parts: Opus 5.5 asked eight questions in two dialogs, Sonnet 5.5
+asked four in one and decided the rest itself.
+Cost: the brief may hold the model's wording, so a drafted brief marks each
+choice nobody was asked about as `(proposed)`, and the log says the brief
+was drafted. The owner reads the stages after the files are written.
+Rejected: a draft file edited after every answer; an approval question
+before the files are written; dialogs without a limit; treating ignored files as free in the hook,
+because `.env` is one; a separate `draft` mode.

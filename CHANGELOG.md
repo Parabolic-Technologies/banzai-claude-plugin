@@ -4,6 +4,22 @@ All notable changes to the Banzai plugin are listed here. Versions follow
 [Semantic Versioning](https://semver.org/). A change to a command name, to
 the hook's decisions or to the document layout is a breaking change.
 
+## 1.0.4 - 2026-11-19
+
+### Added
+
+- `/banzai:epic start` accepts a goal instead of a brief. The command
+  reads the project, asks what changes the scope, the order or the split
+  (at most two question dialogs of four questions), writes the brief,
+  tracker and log, and shows the plan. You change the brief by saying what
+  to change. A choice nobody asked you about is marked `(proposed)`. A
+  brief you bring is still stored as given.
+
+### Changed
+
+- A `/banzai:epic` request that names no mode and describes new work runs
+  `start`. An empty request still runs `next`.
+
 ## 1.0.3 - 2026-11-19
 
 ### Changed

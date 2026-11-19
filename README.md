@@ -159,17 +159,18 @@ approval of unchanged files still holds.
 
 ## Large work
 
-`/banzai:epic` keeps track of work that is too large for one plan. You split
-it into stages and packages yourself, and each package is then built with
-its own `/banzai:feature` or `/banzai:fix`. The command keeps the epic's
-plan, tracker and log in `documentation/epics/<epic>/` and changes no source
-file.
+`/banzai:epic` keeps track of work that is too large for one plan. The work
+is split into stages and packages, and each package is then built with its
+own `/banzai:feature` or `/banzai:fix`. Bring your own plan, or give only
+the goal: the command asks a few questions, writes the plan and shows it,
+and you change it by saying what to change. It keeps the epic's plan,
+tracker and log in `documentation/epics/<epic>/` and changes no source file.
 
-| Mode              | What it does                                                        |
-| ----------------- | ------------------------------------------------------------------- |
-| `start <subject>` | Stores your plan and creates the tracker and the log.               |
-| `next`            | Reports where the epic stands and names the next package to build.  |
-| `record <entry>`  | Records a started or finished package, a question or a decision.    |
+| Mode              | What it does                                                         |
+| ----------------- | -------------------------------------------------------------------- |
+| `start <subject>` | Stores your plan, or drafts one from your goal and answers.          |
+| `next`            | Reports where the epic stands and names the next package to build.   |
+| `record <entry>`  | Records a started or finished package, a question or a decision.     |
 | `gate <N>`        | Lists the evidence for a stage's gate; you decide whether it passed. |
 
 ## What the hook holds back

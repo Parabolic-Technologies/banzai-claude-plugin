@@ -1,9 +1,9 @@
 # Brief template
 
-The brief is the owner's plan. `start` saves the owner's text and writes no
-brief content of its own. Show these headings when the owner has no brief
-yet. Only the stages with their gates, the packages and their "Done when"
-items are required.
+The brief is the owner's plan. `start` stores the owner's text as it is, or
+drafts a brief under these headings from the owner's goal and answers; the
+owner then changes it by saying what to change. Only the stages with their
+gates, the packages and their "Done when" items are required.
 
 ```markdown
 # <Epic title>
@@ -18,7 +18,8 @@ items are required.
 
 ## Decisions already made
 
-- <Decision and its reason.>
+- <Decision and its reason. In a drafted brief: the owner's answer, or a
+  choice nobody was asked about, marked `(proposed)`.>
 
 ## Stage 1: <name>
 

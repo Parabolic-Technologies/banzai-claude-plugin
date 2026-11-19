@@ -1,6 +1,6 @@
 {
   "name": "banzai",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Spec-driven development for Claude Code with a human in the loop: slash commands for requirements, plans and an independent code review, and a guardrail hook that holds Claude's file edits to source code until you approve the plan with one click.",
   "author": {
     "name": "Alexander Torosh",
