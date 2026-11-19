@@ -43,17 +43,19 @@ const APPROVAL_IN_COMPOUND = new RegExp(`(^|[;&|(\\n]\\s*)(:\\s*)?${APPROVAL_NAM
 const MAX_UNAPPROVED = 1000;
 const MAX_SHOWN = 30;
 const MAX_WORKS = 8;
-// The host's dialog shows ten rows of the hook's text and folds the rest. In a
-// terminal of 80 columns a row holds 72 characters, so five such lines leave
-// room for the first row and the file names.
+// The host's dialog shows up to twelve rows of the hook's text, its own first
+// row included, and folds the rest. In a terminal of 80 columns a row holds 72
+// characters, so five such lines leave room for three file names.
 const MAX_SUMMARY_LINES = 5;
 const MAX_SUMMARY_WIDTH = 72;
 
 const approvalCommand = (work) => `: ${APPROVAL_NAME} ${work}`;
-const indented = (items) => items.map((item) => `  ${item}`);
+// A bullet marks each item: the host strips leading spaces when it folds a
+// long text.
+const bulleted = (items) => items.map((item) => `  • ${item}`);
 // File names are shown to the developer: no control characters, no flood.
 const printable = (name) => name.replace(/[\u0000-\u001f\u007f-\u009f\u2028\u2029]/g, '?');
-const listed = (items) => [...indented(items.slice(0, MAX_SHOWN)), ...(items.length > MAX_SHOWN ? [`  and ${items.length - MAX_SHOWN} more`] : [])];
+const listed = (items) => [...bulleted(items.slice(0, MAX_SHOWN)), ...(items.length > MAX_SHOWN ? [`  and ${items.length - MAX_SHOWN} more`] : [])];
 
 function emit(output) {
   if (output) fs.writeSync(1, JSON.stringify(output));
@@ -193,7 +195,8 @@ function onToolCall(payload, root, session) {
     output = decision('ask', [
       `Approval requested for work "${work}". Its plan says:`,
       ...summary,
-      `"Yes" approves these files, until one changes: ${files.map((file) => file.path).join(', ')}`,
+      '"Yes" approves these files until one of them changes:',
+      ...bulleted(files.map((file) => file.path)),
       'Not approved until the developer answers "Yes" here.'
     ].join('\n'));
   } else if (APPROVAL_IN_COMPOUND.test(command)) {

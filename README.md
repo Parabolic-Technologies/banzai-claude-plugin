@@ -48,15 +48,28 @@ been checked.
 
 ## Install
 
-Add the marketplace, then install the plugin for your project:
+Add the marketplace:
 
 ```bash
 claude plugin marketplace add Parabolic-Technologies/banzai-claude-plugin
 ```
 
+Then install the plugin either for one project, from that project's
+directory:
+
 ```bash
 claude plugin install banzai@parabolic-plugins --scope project
 ```
+
+or for all your projects:
+
+```bash
+claude plugin install banzai@parabolic-plugins --scope user
+```
+
+With a user install the commands are available in every project, but the
+hook acts only in a project that has `documentation/work/`, which `setup`
+creates; everywhere else it stays silent.
 
 Then start Claude Code in the project and type:
 
@@ -75,7 +88,7 @@ Then start Claude Code in the project and type:
 Now give it a first piece of work in your own words, for example:
 
 ```text
-/banzai:feature add a --shout flag to the greet CLI
+/banzai:feature let the greet CLI print the greeting in upper case
 ```
 
 The model writes a plan and shows the approval dialog. After your "Yes" it
@@ -86,7 +99,8 @@ writes the code and the tests.
 Commit the files `setup` wrote so that your team shares them. The settings
 make the marketplace known to a teammate's Claude Code but install nothing.
 Each teammate opens the project in Claude Code once and trusts the folder,
-which fetches the marketplace, and then runs the install command above.
+which fetches the marketplace, and then runs one of the install commands
+above.
 
 ## Commands
 
@@ -104,7 +118,7 @@ Always type the full name. A bare `/review` is a different command.
 
 A *work* is one change with its own directory,
 `documentation/work/<work>/`. Its name is the date and the subject, such as
-`261118-greet-shout-flag`, and that name is what `[work]` stands for.
+`261118-greet-upper-case`, and that name is what `[work]` stands for.
 
 ## How planned work goes
 
@@ -132,7 +146,7 @@ When the work is done, your project holds:
 documentation/
 ├── decisions/                decision records
 └── work/
-    └── 261118-greet-shout-flag/
+    └── 261118-greet-upper-case/
         ├── requirements.md   what must be true when it is done
         ├── plan.md           how it will be built
         ├── report.md         what was built and how it was checked
@@ -202,7 +216,8 @@ claude plugin disable banzai@parabolic-plugins
 Approval records are kept in `.banzai/approvals/` in the project, outside
 Git. Losing them costs one new click per work. Uninstalling the plugin
 deletes the hook's data, and approvals made before then no longer count. To
-uninstall and keep them:
+uninstall and keep them, give the scope you installed with, `project` or
+`user`:
 
 ```bash
 claude plugin uninstall banzai@parabolic-plugins --scope project --keep-data

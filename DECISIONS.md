@@ -184,9 +184,10 @@ a plan without such a section.
 Reason: a summary written in chat before the dialog appeared on Haiku only.
 Sonnet and Opus kept it in their reasoning through three wordings of the
 skill, so the developer approved file names. The quoted lines are part of a
-hashed file: changing them ends the approval. The host's dialog shows about
-ten rows of a hook's text and folds the rest, and at 80 columns a row holds
-72 characters; five such lines, the first row and three file names fit.
+hashed file: changing them ends the approval. The host's dialog shows up to
+twelve rows of a hook's text, its own first row included, fewer in a short
+terminal, and folds the rest. At 80 columns a row holds 72 characters, so
+five such lines, the hook's other three rows and three file names fit.
 Not checked: the desktop app and the IDE extensions.
 Rejected: a stop before the dialog for a summary in chat, which makes two
 steps of one click; leaving the developer to open `plan.md` first.

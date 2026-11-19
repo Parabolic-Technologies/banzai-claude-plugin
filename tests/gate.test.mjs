@@ -189,8 +189,8 @@ test('the approval command asks and names the files it will hash', () => {
   entry(root, 'banzai:feature', 'demo');
   const asked = shell(root, `${COMMAND} demo`);
   assert.equal(asked.decision, 'ask');
-  assert.match(asked.reason, /^Approval requested for work "demo"\. Its plan says:\nBuild the demo\.\n"Yes" approves these files, until one changes: /);
-  assert.match(asked.reason, /until one changes: documentation\/work\/demo\/requirements\.md, documentation\/work\/demo\/plan\.md\nNot approved until the developer answers "Yes" here\.$/);
+  assert.match(asked.reason, /^Approval requested for work "demo"\. Its plan says:\nBuild the demo\.\n"Yes" approves these files until one of them changes:\n/);
+  assert.match(asked.reason, /until one of them changes:\n {2}• documentation\/work\/demo\/requirements\.md\n {2}• documentation\/work\/demo\/plan\.md\nNot approved until the developer answers "Yes" here\.$/);
   assert.equal(recordExists(root), false, 'asking approves nothing');
   assert.equal(write(root, 'src/a.js').decision, 'deny');
 });
@@ -547,7 +547,7 @@ test('a shell change to source without approval is remembered, and the next call
 
   const asked = shell(root, 'ls');
   assert.equal(asked.decision, 'ask');
-  assert.match(asked.reason, /\n {2}src\/base\.js\n {2}src\/new\.js\n/);
+  assert.match(asked.reason, /\n {2}• src\/base\.js\n {2}• src\/new\.js\n/);
   assert.equal(shell(root, 'ls').decision, 'ask', 'no answer yet');
 
   const accepted = call(root, nothing);
@@ -593,7 +593,7 @@ test('a failed or stopped command is compared too', () => {
   const stopped = call(root, () => put(root, 'src/b.js', 'x\n'), { event: 'PostToolUseFailure', fields: { is_interrupt: true } });
   assert.equal(stopped.before.decision, 'ask');
   assert.match(stopped.note, /src\/b\.js/);
-  assert.match(shell(root, 'ls').reason, /src\/a\.js\n {2}src\/b\.js/, 'a stopped call accepted nothing');
+  assert.match(shell(root, 'ls').reason, /src\/a\.js\n {2}• src\/b\.js/, 'a stopped call accepted nothing');
 });
 
 test('a change committed by the same command is still seen', () => {

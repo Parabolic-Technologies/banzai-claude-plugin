@@ -1,33 +1,33 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 714 526" width="714" height="526" role="img" aria-labelledby="t d">
 <title id="t">The banzai approval dialog in a terminal</title>
-<desc id="d">Claude Code asks to run the approval command for work 261118-greet-shout-flag. The dialog quotes four lines of the plan, names the file plan.md that the answer approves, and offers Yes and No.</desc>
+<desc id="d">Claude Code asks to run the approval command for work 261118-greet-upper-case. The dialog quotes four lines of the plan, names the file plan.md that the answer approves, and offers Yes and No.</desc>
 <rect width="714" height="526" rx="10" fill="#0d1117"/>
 <path d="M0 10a10 10 0 0 1 10-10h694a10 10 0 0 1 10 10v20H0z" fill="#161b22"/>
 <circle cx="20" cy="15" r="5.5" fill="#ff5f57"/><circle cx="39" cy="15" r="5.5" fill="#febc2e"/><circle cx="58" cy="15" r="5.5" fill="#28c840"/>
 <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="14" xml:space="preserve">
 <text x="20.0" y="60" fill="#d0d0d0">●</text>
-<text x="36.9" y="60" fill="#d0d0d0">Bash(: banzai-request-approval 261118-greet-shout-flag)</text>
+<text x="36.9" y="60" fill="#d0d0d0">Bash(: banzai-request-approval 261118-greet-upper-case)</text>
 <text x="36.9" y="80" fill="#949494">⎿  Waiting…</text>
 <line x1="20" x2="694" y1="115" y2="115" stroke="#afd7ff" stroke-width="1"/>
 <text x="28.4" y="140" fill="#afd7ff" font-weight="bold">Bash command</text>
 <text x="28.4" y="160" fill="#949494">Show the developer the plan approval dialog</text>
 <line x1="20" x2="694" y1="175" y2="175" stroke="#4e4e4e" stroke-width="1" stroke-dasharray="5 3"/>
-<text x="28.4" y="200" fill="#d0d0d0">: banzai-request-approval 261118-greet-shout-flag</text>
+<text x="28.4" y="200" fill="#d0d0d0">: banzai-request-approval 261118-greet-upper-case</text>
 <line x1="20" x2="694" y1="215" y2="215" stroke="#4e4e4e" stroke-width="1" stroke-dasharray="5 3"/>
 <text x="28.4" y="240" fill="#949494">│</text>
-<text x="45.3" y="240" fill="#ffd700">Approval requested for work "261118-greet-shout-flag". Its plan says:</text>
+<text x="45.3" y="240" fill="#ffd700">Approval requested for work "261118-greet-upper-case". Its plan says:</text>
 <text x="28.4" y="260" fill="#949494">│</text>
-<text x="45.3" y="260" fill="#ffd700">Adds --shout to the greet CLI: prints the greeting in upper case.</text>
+<text x="45.3" y="260" fill="#ffd700">Adds an option to the greet CLI that prints the greeting in upper case.</text>
 <text x="28.4" y="280" fill="#949494">│</text>
-<text x="45.3" y="280" fill="#ffd700">- The flag works before or after the name; it is dropped from args.</text>
+<text x="45.3" y="280" fill="#ffd700">- The option works before or after the name; it is dropped from args.</text>
 <text x="28.4" y="300" fill="#949494">│</text>
 <text x="45.3" y="300" fill="#ffd700">- Upper case covers the whole greeting, the name included.</text>
 <text x="28.4" y="320" fill="#949494">│</text>
 <text x="45.3" y="320" fill="#ffd700">- greet() keeps its signature; only the CLI path upper-cases.</text>
 <text x="28.4" y="340" fill="#949494">│</text>
-<text x="45.3" y="340" fill="#ffd700">"Yes" approves these files, until one changes:</text>
+<text x="45.3" y="340" fill="#ffd700">"Yes" approves these files until one of them changes:</text>
 <text x="28.4" y="360" fill="#949494">│</text>
-<text x="45.3" y="360" fill="#ffd700">documentation/work/261118-greet-shout-flag/plan.md</text>
+<text x="62.2" y="360" fill="#ffd700">• documentation/work/261118-greet-upper-case/plan.md</text>
 <text x="28.4" y="380" fill="#949494">│</text>
 <text x="45.3" y="380" fill="#ffd700">Not approved until the developer answers "Yes" here. <tspan opacity="0.6">[plugin:banzai]</tspan></text>
 <text x="28.4" y="420" fill="#d0d0d0">Do you want to proceed?</text>

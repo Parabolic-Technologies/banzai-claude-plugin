@@ -22,13 +22,13 @@
 <circle cx="104" cy="294.5" r="6" fill="#ff5f57"/><circle cx="125" cy="294.5" r="6" fill="#febc2e"/><circle cx="146" cy="294.5" r="6" fill="#28c840"/>
 <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="24" xml:space="preserve">
 <text x="108" y="350" fill="#949494">│</text>
-<text x="132" y="350" fill="#ffd700">Approval requested for work "261118-greet-shout-flag". Its plan says:</text>
+<text x="132" y="350" fill="#ffd700">Approval requested for work "261118-greet-upper-case". Its plan says:</text>
 <text x="108" y="382" fill="#949494">│</text>
-<text x="132" y="382" fill="#ffd700">Adds --shout to the greet CLI: prints the greeting in upper case.</text>
+<text x="132" y="382" fill="#ffd700">Adds an option to the greet CLI that prints the greeting in upper case.</text>
 <text x="108" y="414" fill="#949494">│</text>
-<text x="132" y="414" fill="#ffd700">"Yes" approves these files, until one changes:</text>
+<text x="132" y="414" fill="#ffd700">"Yes" approves these files until one of them changes:</text>
 <text x="108" y="446" fill="#949494">│</text>
-<text x="132" y="446" fill="#ffd700">documentation/work/261118-greet-shout-flag/plan.md</text>
+<text x="161" y="446" fill="#ffd700">• documentation/work/261118-greet-upper-case/plan.md</text>
 <text x="108" y="492" fill="#d0d0d0">Do you want to proceed?</text>
 <text x="108" y="524" fill="#afd7ff">❯</text>
 <text x="132" y="524" fill="#949494">1.</text>

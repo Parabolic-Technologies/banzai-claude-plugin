@@ -4,6 +4,13 @@ All notable changes to the Banzai plugin are listed here. Versions follow
 [Semantic Versioning](https://semver.org/). A change to a command name, to
 the hook's decisions or to the document layout is a breaking change.
 
+## Unreleased
+
+### Changed
+
+- The approval dialog lists the files that "Yes" approves one per line, and
+  both dialogs mark each file with a bullet.
+
 ## 1.0.1 - 2026-11-18
 
 ### Changed
