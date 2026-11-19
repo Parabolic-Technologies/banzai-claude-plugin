@@ -41,8 +41,8 @@ you change source.
 
 Otherwise start new work. Name it `<YYMMDD>-<subject>`: today's date and two
 to five lowercase words joined by hyphens, such as `261118-export-as-csv`.
-Read the code, the tests and the project's `CLAUDE.md` that the request
-touches before you write anything.
+Read the code, the tests and the project's `CLAUDE.md` or `AGENTS.md` that
+the request touches before you write anything.
 
 ## 2. Requirements
 
@@ -132,9 +132,9 @@ Complete `report.md` in the work directory:
    when there are none.
 7. **Follow-ups**: what is left for later. `None` when there is nothing.
 
-Update a `CLAUDE.md` fact only when the work changed a command, a convention
-or a constraint. Then tell the developer in a few lines what was built and
-what the checks showed, and suggest `/banzai:review <work>` for an
-independent review. For an epic package, leave the epic's tracker and log
-alone and name `/banzai:epic record <package> done` as the next step. Do not
-stage, commit or push unless the developer asks.
+Update a `CLAUDE.md` or `AGENTS.md` fact only when the work changed a
+command, a convention or a constraint. Then tell the developer in a few lines
+what was built and what the checks showed, and suggest `/banzai:review <work>`
+for an independent review. For an epic package, leave the epic's tracker and
+log alone and name `/banzai:epic record <package> done` as the next step. Do
+not stage, commit or push unless the developer asks.

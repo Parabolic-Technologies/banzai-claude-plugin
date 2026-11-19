@@ -48,9 +48,10 @@ its message says.
 
 ## Project facts
 
-The project's facts live in its own `CLAUDE.md`, which the developer owns.
-The plugin has no template for it. Check that file, and the files it loads,
-for the facts a model cannot derive from the code:
+The project's facts live in its own instructions file, which the developer
+owns: `CLAUDE.md`, or `AGENTS.md` when the project has no `CLAUDE.md`. The
+plugin has no template for it. Check that file, and the files it loads, for
+the facts a model cannot derive from the code:
 
 - the exact commands to build, test, lint and format;
 - conventions the team chose, and constraints;
@@ -63,12 +64,18 @@ lines you would add and ask before you write them. Record only a command you
 found in the project or the developer gave you; never guess one. Do not
 describe architecture, modules or data flow; those are read from the code.
 
+Add the lines to the file that already holds the project's facts, which may
+be one that `CLAUDE.md` loads, such as `AGENTS.md`. Never create a
+`CLAUDE.md` beside an `AGENTS.md`: by default Claude Code loads `AGENTS.md`
+only while the project has no `CLAUDE.md`. When the project has neither
+file, create `CLAUDE.md`.
+
 ## Report
 
 List what you created, what you changed and what was already in place. Name
-any fact that is still missing from `CLAUDE.md`. Say that the settings make
-the marketplace known but install nothing: each teammate opens the project
-in Claude Code once, trusts the folder, and then runs
+any fact that is still missing from the instructions file. Say that the
+settings make the marketplace known but install nothing: each teammate opens
+the project in Claude Code once, trusts the folder, and then runs
 `claude plugin install banzai@parabolic-plugins --scope project`. Then name the two
 commands that start work: `/banzai:fix <request>` for a small direct change
 and `/banzai:feature <request>` for planned work. Do not stage or commit.

@@ -29,9 +29,10 @@ hook treats a session that wrote one as planned work.
 
 ## Work
 
-1. Read the code, the tests and the project's `CLAUDE.md` before you change
-   anything. A review finding named by its ID is read from the work's
-   `review.md`. For a defect, find the cause; do not patch the symptom.
+1. Read the code, the tests and the project's `CLAUDE.md` or `AGENTS.md`
+   before you change anything. A review finding named by its ID is read from
+   the work's `review.md`. For a defect, find the cause; do not patch the
+   symptom.
 2. Ask only a question whose answer changes what you build. Otherwise take
    the default that the existing code implies and name it in the report.
 3. Make the smallest change that is correct and fits the code around it.
@@ -40,12 +41,12 @@ hook treats a session that wrote one as planned work.
 4. For a defect that could come back, write the test that fails without the
    fix first. Do not add a test that protects nothing.
 5. Run the project's checks that cover the change, with the commands from
-   `CLAUDE.md` or, where it names none, from the project's own scripts.
-   Never turn a failure into success: do not weaken or skip a test, swallow
-   an error or change an expected value to make a check pass. A check that
-   fails for another reason is reported, not hidden.
-6. Update a document or a `CLAUDE.md` fact only when the change made it
-   wrong.
+   `CLAUDE.md` or `AGENTS.md`, or from the project's own scripts where
+   neither names one. Never turn a failure into success: do not weaken or
+   skip a test, swallow an error or change an expected value to make a check
+   pass. A check that fails for another reason is reported, not hidden.
+6. Update a document or a `CLAUDE.md` or `AGENTS.md` fact only when the
+   change made it wrong.
 
 Do not edit an accepted decision record. If the fix conflicts with one, stop
 and say so.

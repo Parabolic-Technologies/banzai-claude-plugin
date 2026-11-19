@@ -4,6 +4,14 @@ All notable changes to the Banzai plugin are listed here. Versions follow
 [Semantic Versioning](https://semver.org/). A change to a command name, to
 the hook's decisions or to the document layout is a breaking change.
 
+## 1.0.3 - 2026-11-19
+
+### Changed
+
+- The commands read a project's `AGENTS.md` as well as its `CLAUDE.md`.
+  `/banzai:setup` records commands in `AGENTS.md` when the project has no
+  `CLAUDE.md`, instead of creating one.
+
 ## 1.0.2 - 2026-11-19
 
 ### Added

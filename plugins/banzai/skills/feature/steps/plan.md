@@ -36,8 +36,9 @@ dependency, and why this way. Name the existing code the change builds on.>
 ## Verification
 
 <The exact commands that will be run at the end, and any manual check with
-its expected result. Take the commands from the project's CLAUDE.md or,
-where it names none, from the project's own scripts, and name the source.>
+its expected result. Take the commands from the project's `CLAUDE.md` or
+`AGENTS.md`; where neither names one, take it from the project's own
+scripts. Name the source.>
 
 ## Out of scope
 

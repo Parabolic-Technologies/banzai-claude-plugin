@@ -41,6 +41,6 @@ check that once by breaking the code and watching it fail.
 
 Record every command exactly as you ran it, with its result, for the report.
 A check that failed, was skipped or could not run is reported as such. When
-neither `CLAUDE.md` nor the project's own scripts (package scripts, a
-Makefile, CI) define a command for a check, say so in the report; do not
-invent one.
+none of `CLAUDE.md`, `AGENTS.md` and the project's own scripts (package
+scripts, a Makefile, CI) defines a command for a check, say so in the report;
+do not invent one.

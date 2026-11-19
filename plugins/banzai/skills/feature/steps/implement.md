@@ -19,7 +19,7 @@ now; the code is where the work happens.
 - Follow every decision record the plan links to. Its "Decision" and
   "Consequences" sections bind the code.
 - Match the code around the change: naming, error handling, structure and
-  the conventions in the project's `CLAUDE.md`.
+  the conventions in the project's `CLAUDE.md` or `AGENTS.md`.
 - Before the first source change, note the commit the work starts from
   (`git rev-parse --short HEAD`) as `Base:` in `report.md`.
 - Write a comment only to explain why: a constraint, a trade-off or

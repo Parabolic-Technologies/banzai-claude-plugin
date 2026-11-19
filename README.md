@@ -83,7 +83,8 @@ Then start Claude Code in the project and type:
 - enables the plugin and names its marketplace in `.claude/settings.json`;
 - creates `documentation/decisions/` and `documentation/work/`;
 - offers to record the project's build, test, lint and format commands in
-  your `CLAUDE.md`, and asks before it writes them.
+  your `CLAUDE.md`, or in your `AGENTS.md` when there is no `CLAUDE.md`, and
+  asks before it writes them.
 
 Now give it a first piece of work in your own words, for example:
 

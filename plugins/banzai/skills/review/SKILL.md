@@ -22,7 +22,7 @@ the developer can act on, or with a clear pass.
 Collect, without judging yet:
 
 - the intent: `requirements.md`, `plan.md`, the decision records the plan
-  links to, and the project's `CLAUDE.md`;
+  links to, and the project's `CLAUDE.md` or `AGENTS.md`;
 - the change: the files that `report.md` lists and the Git commands that
   show them: `git diff <base>` with the base commit that `report.md` names,
   and `git status --short`;
@@ -57,7 +57,8 @@ Brief for the reviewer:
 > 7. Report: its file list and verification claims match what you see. Run
 >    the checks again.
 > 8. Fit: the change reuses what the project already has, adds no unused
->    generality and leaves no document or `CLAUDE.md` fact stale.
+>    generality and leaves no fact stale in a document, `CLAUDE.md` or
+>    `AGENTS.md`.
 >
 > Report findings only. A finding needs all four: exact evidence (a command
 > with its output, or the quoted code), a location as `file:line`, the

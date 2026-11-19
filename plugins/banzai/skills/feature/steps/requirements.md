@@ -6,7 +6,7 @@ say how to build it.
 ## Before writing
 
 - Read what the request touches: code, tests, documents, accepted decision
-  records and the project's `CLAUDE.md`.
+  records and the project's `CLAUDE.md` or `AGENTS.md`.
 - Ask the developer only about substance: what the feature covers and for
   whom. Substance is open when the request names a kind of thing but not
   which ones (which languages, which formats, which users), or can be read

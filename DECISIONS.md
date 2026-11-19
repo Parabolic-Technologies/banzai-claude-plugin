@@ -227,3 +227,15 @@ longer count and each work needs one new click.
 Not checked: installing from GitHub itself and an update to a new version.
 Rejected: `enabledPlugins` alone; leaving both commands to the README.
 
+## 2026-11-19: `setup` never creates a `CLAUDE.md` beside an `AGENTS.md`
+
+The commands read the project's `CLAUDE.md` or `AGENTS.md`. `setup` adds a
+missing command to the file that already holds the project's facts, and
+creates `CLAUDE.md` only when the project has neither file.
+Reason: by default Claude Code loads `AGENTS.md` only while the project has
+no `CLAUDE.md` (its `instructionFiles` setting, `claude-md-or-agents-md`).
+A new `CLAUDE.md` with a few commands would silently take the team's
+`AGENTS.md` out of every session.
+Rejected: always writing to `CLAUDE.md`; creating a `CLAUDE.md` that only
+imports `AGENTS.md`.
+
