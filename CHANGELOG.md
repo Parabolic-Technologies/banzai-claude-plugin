@@ -4,7 +4,12 @@ All notable changes to the Banzai plugin are listed here. Versions follow
 [Semantic Versioning](https://semver.org/). A change to a command name, to
 the hook's decisions or to the document layout is a breaking change.
 
-## Unreleased
+## 1.0.2 - 2026-11-19
+
+### Added
+
+- The README describes installing the plugin for all your projects with
+  `--scope user`.
 
 ### Changed
 
