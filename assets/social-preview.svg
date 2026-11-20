@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" width="1280" height="640" role="img" aria-labelledby="t d">
 <title id="t">Banzai, a Claude Code plugin</title>
-<desc id="d">Spec-driven development with a human in the loop. Below, the approval dialog quotes the plan, names the file plan.md that the answer approves, and offers Yes and No.</desc>
+<desc id="d">Spec-driven development with a human in the loop or on the loop. Two terminal panels. Left, /banzai:feature: the approval dialog quotes the plan and offers Yes and No. Right, /banzai:auto: the last message lists what was built, what you decided, what was decided for you, the review, the checks and the change.</desc>
 <defs>
 <linearGradient id="accent" x1="0" x2="1" y1="0" y2="0">
 <stop offset="0" stop-color="#1b3fa8"/><stop offset="0.55" stop-color="#6a1ee6"/><stop offset="1" stop-color="#d400ff"/>
@@ -14,26 +14,40 @@
 <text x="192" y="129" font-size="84" font-weight="700" fill="#f0f6fc">Banzai</text>
 <rect x="912" y="76" width="288" height="48" rx="24" fill="none" stroke="#afd7ff" stroke-opacity="0.55" stroke-width="1.5"/>
 <text x="1056" y="109" font-size="26" font-weight="500" fill="#afd7ff" text-anchor="middle">Claude Code plugin</text>
-<text x="80" y="200" font-size="38" font-weight="600" fill="#f0f6fc">Spec-driven development with a human in the loop</text>
-<text x="80" y="244" font-size="26" fill="#9198a1">The agent writes the plan · you approve it with one click · then it writes the code</text>
+<text x="80" y="200" font-size="36" font-weight="600" fill="#f0f6fc">Spec-driven development with a human in the loop or on the loop</text>
+<text x="80" y="244" font-size="26" fill="#9198a1">The agent works from a written plan · approve it before the code, or read the report after</text>
 </g>
-<rect x="80.75" y="276.75" width="1118.5" height="302.5" rx="12" fill="#010409" stroke="#30363d" stroke-width="1.5"/>
-<path d="M81.5 289a11.5 11.5 0 0 1 11.5-11.5h1094a11.5 11.5 0 0 1 11.5 11.5v22.5H81.5z" fill="#161b22"/>
+<rect x="80.75" y="276.75" width="547.25" height="302.5" rx="12" fill="#010409" stroke="#30363d" stroke-width="1.5"/>
+<path d="M81.5 289a11.5 11.5 0 0 1 11.5-11.5h522.75a11.5 11.5 0 0 1 11.5 11.5v22.5H81.5z" fill="#161b22"/>
 <circle cx="104" cy="294.5" r="6" fill="#ff5f57"/><circle cx="125" cy="294.5" r="6" fill="#febc2e"/><circle cx="146" cy="294.5" r="6" fill="#28c840"/>
-<g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="24" xml:space="preserve">
-<text x="108" y="350" fill="#949494">│</text>
-<text x="132" y="350" fill="#ffd700">Approval requested for work "261118-greet-upper-case". Its plan says:</text>
+<rect x="652.75" y="276.75" width="546.5" height="302.5" rx="12" fill="#010409" stroke="#30363d" stroke-width="1.5"/>
+<path d="M653.5 289a11.5 11.5 0 0 1 11.5-11.5h522a11.5 11.5 0 0 1 11.5 11.5v22.5H653.5z" fill="#161b22"/>
+<circle cx="676" cy="294.5" r="6" fill="#ff5f57"/><circle cx="697" cy="294.5" r="6" fill="#febc2e"/><circle cx="718" cy="294.5" r="6" fill="#28c840"/>
+<g font-family="-apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="18" font-weight="600" text-anchor="end">
+<text x="606" y="301" fill="#9198a1">Human in the loop · <tspan fill="#afd7ff">/banzai:feature</tspan></text>
+<text x="1177" y="301" fill="#9198a1">Human on the loop · <tspan fill="#afd7ff">/banzai:auto</tspan></text>
+</g>
+<g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="20" xml:space="preserve">
+<text x="108" y="352" fill="#949494">│</text>
+<text x="132" y="352" fill="#ffd700">Adds an option to the greet CLI that</text>
 <text x="108" y="382" fill="#949494">│</text>
-<text x="132" y="382" fill="#ffd700">Adds an option to the greet CLI that prints the greeting in upper case.</text>
-<text x="108" y="414" fill="#949494">│</text>
-<text x="132" y="414" fill="#ffd700">"Yes" approves these files until one of them changes:</text>
-<text x="108" y="446" fill="#949494">│</text>
-<text x="161" y="446" fill="#ffd700">• documentation/work/261118-greet-upper-case/plan.md</text>
-<text x="108" y="492" fill="#d0d0d0">Do you want to proceed?</text>
-<text x="108" y="524" fill="#afd7ff">❯</text>
-<text x="132" y="524" fill="#949494">1.</text>
-<text x="176" y="524" fill="#afd7ff">Yes</text>
-<text x="132" y="556" fill="#949494">2.</text>
-<text x="176" y="556" fill="#d0d0d0">No</text>
+<text x="132" y="382" fill="#ffd700">prints the greeting in upper case.</text>
+<text x="108" y="412" fill="#949494">│</text>
+<text x="132" y="412" fill="#ffd700">Approval requested for work</text>
+<text x="108" y="442" fill="#949494">│</text>
+<text x="132" y="442" fill="#ffd700">"261118-greet-upper-case".</text>
+<text x="108" y="488" fill="#d0d0d0">Do you want to proceed?</text>
+<text x="108" y="518" fill="#afd7ff">❯</text>
+<text x="132" y="518" fill="#949494">1.</text>
+<text x="168" y="518" fill="#afd7ff">Yes</text>
+<text x="132" y="548" fill="#949494">2.</text>
+<text x="168" y="548" fill="#d0d0d0">No</text>
+<text x="680" y="352" fill="#d0d0d0"><tspan fill="#f0f6fc" font-weight="700">Built:</tspan> greet CLI prints in upper case</text>
+<text x="680" y="386" fill="#d0d0d0"><tspan fill="#f0f6fc" font-weight="700">You decided:</tspan> the option is --upper</text>
+<text x="680" y="420" fill="#d0d0d0"><tspan fill="#f0f6fc" font-weight="700">Decided for you:</tspan> 3 choices, listed</text>
+<text x="680" y="454" fill="#d0d0d0"><tspan fill="#f0f6fc" font-weight="700">Review:</tspan> <tspan fill="#3fb950">pass</tspan> · 1 major finding fixed</text>
+<text x="680" y="488" fill="#d0d0d0"><tspan fill="#f0f6fc" font-weight="700">Checks:</tspan> npm test, 6 of 6 pass</text>
+<text x="680" y="522" fill="#d0d0d0"><tspan fill="#f0f6fc" font-weight="700">The change:</tspan> git diff a8ebf2f</text>
+<text x="680" y="556" fill="#949494">No approval dialog. Nothing committed.</text>
 </g>
 </svg>

@@ -1,7 +1,7 @@
 {
   "name": "banzai",
-  "version": "1.0.5",
-  "description": "Spec-driven development for Claude Code with a human in the loop: slash commands for requirements, plans and an independent code review, and a guardrail hook that holds Claude's file edits to source code until you approve the plan with one click.",
+  "version": "1.1.0",
+  "description": "Spec-driven development for Claude Code with a human in the loop or on the loop: slash commands for requirements, plans and an independent code review, a guardrail hook that holds Claude's file edits to source code until you approve the plan with one click, and a command that runs planned work to its end with no approval.",
   "author": {
     "name": "Alexander Torosh",
     "email": "alexander@parabolic.io"
@@ -12,6 +12,7 @@
   "keywords": [
     "spec-driven-development",
     "human-in-the-loop",
+    "human-on-the-loop",
     "workflow",
     "planning",
     "code-review",

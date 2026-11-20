@@ -4,7 +4,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { test } from 'node:test';
 import {
-  COMMAND, SUMMARY, dataOf, repo, put, hook, pre, write, shell, post, entry, plannedRepo
+  COMMAND, SUMMARY, dataOf, repo, put, hook, pre, write, shell, post, entry, plannedRepo, gitRepo, call,
+  approve, recordExists
 } from './helpers.mjs';
 
 test('a project without documentation/work/ gets no decision', () => {
@@ -97,7 +98,42 @@ test('only the plugin\'s own entry commands count', () => {
   entry(root, 'other:fix');
   entry(root, 'banzai:review');
   entry(root, 'fix');
+  entry(root, 'banzai:auto', '', { command_source: 'bundled' });
+  entry(root, 'other:auto');
   assert.equal(write(root, 'src/a.js').decision, 'ask');
+});
+
+test('/banzai:auto allows source writes, before a plan and after one is written', () => {
+  const root = repo();
+  entry(root, 'banzai:auto', 'add a thing');
+  assert.equal(write(root, 'src/a.js').decision, null);
+  put(root, 'documentation/work/demo/plan.md', '# Plan\n' + SUMMARY);
+  post(root, 'Write', { file_path: path.join(root, 'documentation/work/demo/plan.md') }, 'p1');
+  assert.equal(write(root, 'src/a.js').decision, null, 'the plan needs no approval here');
+  assert.equal(recordExists(root), false);
+});
+
+test('/banzai:auto accepts a change made through the shell', () => {
+  const root = gitRepo();
+  entry(root, 'banzai:auto', 'add a thing');
+  assert.equal(call(root, () => put(root, 'src/base.js', 'changed\n')).note, '');
+  assert.equal(shell(root, 'git status').decision, null);
+});
+
+test('/banzai:feature typed after /banzai:auto closes the source again', () => {
+  const root = plannedRepo();
+  entry(root, 'banzai:auto', 'demo go on');
+  assert.equal(write(root, 'src/a.js').decision, null);
+  entry(root, 'banzai:feature', 'demo go on');
+  assert.match(write(root, 'src/a.js').reason, /has not approved/);
+});
+
+test('in a /banzai:auto session the approval command still asks the developer', () => {
+  const root = plannedRepo();
+  entry(root, 'banzai:auto', 'demo go on');
+  post(root, 'Write', { file_path: path.join(root, 'documentation/work/demo/plan.md') }, 'p1');
+  approve(root, 'demo');
+  assert.equal(recordExists(root), true);
 });
 
 test('/banzai:feature allows no source write before a plan exists', () => {

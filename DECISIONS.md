@@ -31,6 +31,7 @@ developer's message names the command with its slash, and such a start
 raises no expansion event. So the expansion event is the one signal that a
 human chose the command. A "Yes" on a write dialog cannot unlock the session,
 because that dialog hides the hook's text.
+Since 2026-11-20 `/banzai:auto` is a third entry command; see its entry.
 Rejected: reading the prompt text; one "Yes" on a write unlocking the session.
 
 ## 2026-11-17: Planned work outranks the session approval
@@ -40,6 +41,8 @@ record is valid and the developer named or approved that work in this session:
 by typing `/banzai:feature <work>`, or by answering "Yes" to the approval
 dialog. Writing a plan with a file tool attaches the session but clears
 nothing. Only a typed entry command detaches it; a missing plan denies.
+A session started with `/banzai:auto` is the one exception; see the entry of
+2026-11-20.
 Reason: otherwise typing `/banzai:feature` would itself approve a plan nobody
 has read, and a model could move the session onto old approved work by
 running the approval command for it or by rewriting its plan unchanged.
@@ -301,3 +304,57 @@ and read a chat token from `.env` to repeat that check, and the session had
 added the project's access rules to the brief on its own.
 Rejected: a question before the reviewer starts, which blocks every review;
 a list of forbidden tools in the hook.
+
+## 2026-11-20: `/banzai:auto` runs planned work without the approval click
+
+Owner decision. A third entry command, typed by the developer, lets a
+session plan, build, review and fix one request with no approval of the
+plan. To the hook such a session passes every source change, as after
+`/banzai:fix`, and a plan written in it closes nothing. The approval command
+still asks when it is run, and typing `/banzai:feature <work>` afterwards
+puts the work behind the approval again.
+The command asks the developer once, before any file is written: up to four
+questions of substance in the session's question dialog. It stops there, and
+again after the plan's audit, when the work decides something that is costly
+to reverse, and names `/banzai:feature`. One such decision that a single
+question settles goes into the dialog instead, and the developer's answer
+decides it; with no dialog the command stops. After that it asks nothing and
+reports in its last message.
+Two audits take the place of the developer's reading: one of the plan before
+any source change, one of the finished change. Each runs as a hidden skill
+with `context: fork` and the plugin's own agent, which has no file-writing
+tool. The session confirms each finding, fixes the confirmed `blocker` and
+`major` ones and has the change audited once more; one round of fixes is the
+limit. `/banzai:review` is unchanged and fixes nothing.
+Reason: whether a person must read a plan before the code is written depends
+on the task, not on the project, and a typed command is already how the
+developer gives their word. Seen on Claude Code 2.1.329 with Sonnet: a typed
+skill started the hidden skill, which ran as the plugin's agent and saw no
+earlier conversation. With `background: false` it returned in the same turn,
+while an agent started through the `Agent` tool went to the background and
+ended the turn. The agent named no `Write` or `Edit` among its tools.
+The hook gives no notice when such a plan is written. The terminal shows a
+hook's `systemMessage` under the tool's result, but the desktop app folds it
+two clicks deep, so the last message carries the plan.
+This takes back, for this command only, the rejection of "a separate
+reviewer agent shipped by the plugin" of 2026-11-18.
+Runs of 2026-11-20 on Sonnet and Opus. Two early runs led to corrections of
+the text: one asked nothing about a request that named no language and
+chose one itself, and one ran the approval command out of habit, which the
+session-start text had taught it. After that both models raised the dialog,
+with two questions, for the open request; both stopped at once and changed
+nothing for a new dependency and for data kept between runs; and on a work
+with a seeded defect that its tests did not catch, both reported it as a
+blocker, fixed it with a failing test first and had a second audit confirm
+it closed. A run in the desktop app on 2026-11-20, on Opus, raised the dialog
+with three questions and went through to its last message. Its plan audit
+built the planned change in a copy to try it, and a minor finding of that
+audit, left open as the text then said, came back from the change audit.
+Since then the plan audit reads and runs only what exists, and the session
+corrects minor findings of the plan too. Not checked: Haiku.
+Rejected: a mode per project, chosen in `setup`, because every rule of the
+hook and every public statement would then depend on a setting, and a commit
+could switch a team's approval off; removing `disable-model-invocation` from
+`review` so that it could be called, because its description would load into
+every session and its text forbids fixes; questions at a later point of the
+run.

@@ -227,7 +227,7 @@ const sessionPath = (sessionId, suffix) => path.join(dataDir(), `${sessionName(s
 
 // Session state:
 //   root       the project, fixed at the session's first event
-//   entry      'fix' or 'feature', from the entry command the developer typed
+//   entry      'fix', 'feature' or 'auto', from the entry command the developer typed
 //   work       the work this session is attached to
 //   cleared    the work the developer named or approved in this session
 //   unapproved source files that tool calls changed without approval
@@ -236,7 +236,7 @@ export function readSession(sessionId) {
   const text = (value) => (typeof value === 'string' && value ? value : null);
   return {
     root: text(stored.root),
-    entry: stored.entry === 'fix' || stored.entry === 'feature' ? stored.entry : null,
+    entry: ['fix', 'feature', 'auto'].includes(stored.entry) ? stored.entry : null,
     work: text(stored.work),
     cleared: text(stored.cleared),
     unapproved: Array.isArray(stored.unapproved) ? stored.unapproved.filter((item) => typeof item === 'string') : []

@@ -76,8 +76,9 @@ List what you created, what you changed and what was already in place. Name
 any fact that is still missing from the instructions file. Say that the
 settings make the marketplace known but install nothing: each teammate opens
 the project in Claude Code once, trusts the folder, and then runs
-`claude plugin install banzai@parabolic-plugins --scope project`. Then name the two
-commands that start work: `/banzai:fix <request>` for a small direct change
-and `/banzai:feature <request>` for planned work. Show these two in a `text`
-code block, not a `bash` one: they go into the message box, and the shell
-does not know them. Do not stage or commit.
+`claude plugin install banzai@parabolic-plugins --scope project`. Then name the
+three commands that start work: `/banzai:fix <request>` for a small direct
+change, `/banzai:feature <request>` for planned work, and
+`/banzai:auto <request>` for planned work that runs with no approval of the
+plan. Show these in a `text` code block, not a `bash` one: they go into the
+message box, and the shell does not know them. Do not stage or commit.

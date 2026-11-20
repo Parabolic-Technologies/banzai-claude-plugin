@@ -4,6 +4,29 @@ All notable changes to the Banzai plugin are listed here. Versions follow
 [Semantic Versioning](https://semver.org/). A change to a command name, to
 the hook's decisions or to the document layout is a breaking change.
 
+## 1.1.0 - 2026-11-20
+
+### Added
+
+- `/banzai:auto <what to build>`: planned work with no approval of the
+  plan. It asks its questions once, in one dialog at the start, has the
+  plan and the finished change audited by an independent reviewer, fixes
+  the blocker and major findings and reports in its last message. For a
+  decision that is costly to reverse and that one question cannot settle,
+  it stops and names `/banzai:feature`.
+
+### Changed
+
+- After `/banzai:auto` the session may change source files, and a plan
+  written in it needs no approval. `/banzai:feature <work>` typed
+  afterwards asks for the approval again.
+- The approval dialog shows the plan's lines first.
+
+### Fixed
+
+- In the desktop app the hook no longer refuses the app's own task list
+  and summary calls.
+
 ## 1.0.5 - 2026-11-19
 
 ### Changed

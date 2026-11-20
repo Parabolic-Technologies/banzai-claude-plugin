@@ -10,12 +10,13 @@
 //   2. the target is outside the project           -> no decision
 //   3. the target is the gate's own state          -> deny
 //   4. the target is documentation or a notes file -> no decision
-//   5. the session is attached to a work           -> pass only with a valid
+//   5. the session started with /banzai:auto       -> no decision
+//   6. the session is attached to a work           -> pass only with a valid
 //      approval record that the developer named or approved in this session
-//   6. the session started with /banzai:fix        -> no decision
-//   7. the session started with /banzai:feature    -> deny until a plan is
+//   7. the session started with /banzai:fix        -> no decision
+//   8. the session started with /banzai:feature    -> deny until a plan is
 //      written with a file tool
-//   8. otherwise                                   -> ask, for this one change
+//   9. otherwise                                   -> ask, for this one change
 //
 // The shell and MCP tools can change files too, and the host does not say
 // which. The hook compares source content before and after each such call.
@@ -35,7 +36,7 @@ import {
   snapshot, sweepSessions, takePending, updateSession, writeRecord
 } from './state.mjs';
 
-const ENTRY_COMMANDS = { 'banzai:fix': 'fix', 'banzai:feature': 'feature' };
+const ENTRY_COMMANDS = { 'banzai:fix': 'fix', 'banzai:feature': 'feature', 'banzai:auto': 'auto' };
 const FILE_TOOLS = new Set(['Write', 'Edit', 'MultiEdit', 'NotebookEdit']);
 const APPROVAL_NAME = 'banzai-request-approval';
 const APPROVAL_COMMAND = new RegExp(`^(?::[ \\t]*)?${APPROVAL_NAME}[ \\t]+(\\S+)$`);
@@ -99,6 +100,7 @@ function summaryOf(root, work) {
 
 // Whether a source change passes now. With `reason`, why it does not.
 function standing(root, session) {
+  if (session.entry === 'auto') return { ok: true };
   const work = session.work;
   if (!work) return { ok: session.entry === 'fix' };
   const run = `run exactly this shell command, alone: ${approvalCommand(work)}`;
@@ -121,8 +123,8 @@ function onSessionStart(payload, root, session) {
   const here = session.work ? `attached to work "${session.work}"` : session.entry ? `started with /banzai:${session.entry}` : 'no entry command typed yet';
   return context('SessionStart', [
     'This project uses the banzai plugin: source changes need the developer\'s go-ahead.',
-    '- The developer starts work by typing /banzai:fix <request> for a small direct change, or /banzai:feature <request or work name> for planned work. Only a command the developer typed counts; one you start through the Skill tool does not. Without one, each source change asks the developer.',
-    `- Planned work has a plan at documentation/work/<work>/plan.md. After writing or changing it, show the developer the approval dialog by running exactly this shell command, alone: ${approvalCommand('<work>')}`,
+    '- The developer starts work by typing /banzai:fix <request> for a small direct change, /banzai:feature <request or work name> for planned work, or /banzai:auto <request or work name> for planned work that runs with no approval dialog. Only a command the developer typed counts; one you start through the Skill tool does not. Without one, each source change asks the developer.',
+    `- Planned work has a plan at documentation/work/<work>/plan.md. After writing or changing it, show the developer the approval dialog by running exactly this shell command, alone: ${approvalCommand('<work>')} Work the developer started with /banzai:auto needs no approval: do not run it there.`,
     '- Source changes made through the shell or other tools are compared before and after, and unapproved ones are shown to the developer in the dialog of the next shell command.',
     '- The developer can also type /banzai:review <work> for an independent review and /banzai:epic for large work split into packages. Always name a command in full; a bare /review is a different command.',
     `Newest work: ${works.length ? works.join('; ') : 'none yet'}.`,
@@ -159,7 +161,7 @@ function onFileWrite(payload, root, session) {
   if (session.entry === 'feature') {
     return decision('deny', `Planned work starts with a plan. Write documentation/work/<work>/plan.md with a file tool first, then run exactly this shell command, alone: ${approvalCommand('<work>')}`);
   }
-  return decision('ask', `This session has no typed /banzai:fix or /banzai:feature command. Allowing it permits this one change to ${rel}.`);
+  return decision('ask', `This session has no typed /banzai:fix, /banzai:feature or /banzai:auto command. Allowing it permits this one change to ${rel}.`);
 }
 
 // Before a shell or MCP call. `request` is what the developer's answer will mean.
@@ -179,7 +181,7 @@ function onToolCall(payload, root, session) {
     if (!files) {
       return decision('deny', `Work "${work}" has no plan. Write documentation/work/${work}/plan.md first, then run: ${approvalCommand(work)}`);
     }
-    if (session.work === work && standing(root, session).ok && !session.unapproved.length) {
+    if (session.entry !== 'auto' && session.work === work && standing(root, session).ok && !session.unapproved.length) {
       return decision('deny', `Work "${work}" is already approved and its files have not changed. Source writes are allowed; there is no need to run this command.`);
     }
     // Their list would push the plan's lines out of the dialog's visible rows.
