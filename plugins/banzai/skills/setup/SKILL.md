@@ -78,4 +78,6 @@ settings make the marketplace known but install nothing: each teammate opens
 the project in Claude Code once, trusts the folder, and then runs
 `claude plugin install banzai@parabolic-plugins --scope project`. Then name the two
 commands that start work: `/banzai:fix <request>` for a small direct change
-and `/banzai:feature <request>` for planned work. Do not stage or commit.
+and `/banzai:feature <request>` for planned work. Show these two in a `text`
+code block, not a `bash` one: they go into the message box, and the shell
+does not know them. Do not stage or commit.

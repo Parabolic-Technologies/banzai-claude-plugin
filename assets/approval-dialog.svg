@@ -15,21 +15,21 @@
 <text x="28.4" y="200" fill="#d0d0d0">: banzai-request-approval 261118-greet-upper-case</text>
 <line x1="20" x2="694" y1="215" y2="215" stroke="#4e4e4e" stroke-width="1" stroke-dasharray="5 3"/>
 <text x="28.4" y="240" fill="#949494">│</text>
-<text x="45.3" y="240" fill="#ffd700">Approval requested for work "261118-greet-upper-case". Its plan says:</text>
+<text x="45.3" y="240" fill="#ffd700">Adds an option to the greet CLI that prints the greeting in upper case.</text>
 <text x="28.4" y="260" fill="#949494">│</text>
-<text x="45.3" y="260" fill="#ffd700">Adds an option to the greet CLI that prints the greeting in upper case.</text>
+<text x="45.3" y="260" fill="#ffd700">- The option works before or after the name; it is dropped from args.</text>
 <text x="28.4" y="280" fill="#949494">│</text>
-<text x="45.3" y="280" fill="#ffd700">- The option works before or after the name; it is dropped from args.</text>
+<text x="45.3" y="280" fill="#ffd700">- Upper case covers the whole greeting, the name included.</text>
 <text x="28.4" y="300" fill="#949494">│</text>
-<text x="45.3" y="300" fill="#ffd700">- Upper case covers the whole greeting, the name included.</text>
+<text x="45.3" y="300" fill="#ffd700">- greet() keeps its signature; only the CLI path upper-cases.</text>
 <text x="28.4" y="320" fill="#949494">│</text>
-<text x="45.3" y="320" fill="#ffd700">- greet() keeps its signature; only the CLI path upper-cases.</text>
+<text x="45.3" y="320" fill="#ffd700">Approval requested for work "261118-greet-upper-case".</text>
 <text x="28.4" y="340" fill="#949494">│</text>
-<text x="45.3" y="340" fill="#ffd700">"Yes" approves these files until one of them changes:</text>
+<text x="45.3" y="340" fill="#ffd700">Allowing this command approves these files until one of them changes:</text>
 <text x="28.4" y="360" fill="#949494">│</text>
 <text x="62.2" y="360" fill="#ffd700">• documentation/work/261118-greet-upper-case/plan.md</text>
 <text x="28.4" y="380" fill="#949494">│</text>
-<text x="45.3" y="380" fill="#ffd700">Not approved until the developer answers "Yes" here. <tspan opacity="0.6">[plugin:banzai]</tspan></text>
+<text x="45.3" y="380" fill="#ffd700">Not approved until the developer allows it here. <tspan opacity="0.6">[plugin:banzai]</tspan></text>
 <text x="28.4" y="420" fill="#d0d0d0">Do you want to proceed?</text>
 <text x="28.4" y="440" fill="#afd7ff">❯</text>
 <text x="45.3" y="440" fill="#949494">1.</text>

@@ -64,4 +64,7 @@ a finding: record a rejection there with their words, and never reject one
 yourself. An epic's tracker and log are written by `/banzai:epic record`,
 not here.
 
+Show a command the developer is to type in a `text` code block, not a `bash`
+one: it goes into the message box, and the shell does not know it.
+
 Do not stage, commit or push unless the developer asks.

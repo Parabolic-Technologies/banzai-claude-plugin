@@ -86,6 +86,10 @@ nothing added:
 
 The command does nothing by itself. A hook answers it with that dialog, and
 only the developer can answer it.
+Give the tool call a description that says what the developer approves, in
+the language they write in, such as "Approve the plan: export orders as
+CSV". The desktop app shows that line in full and only the first rows of the
+hook's text, which are hard to read there.
 Do not change source files before the developer has answered "Yes".
 
 - "Yes": the command returns and the hook says the work is approved. Go on.
@@ -136,5 +140,7 @@ Update a `CLAUDE.md` or `AGENTS.md` fact only when the work changed a
 command, a convention or a constraint. Then tell the developer in a few lines
 what was built and what the checks showed, and suggest `/banzai:review <work>`
 for an independent review. For an epic package, leave the epic's tracker and
-log alone and name `/banzai:epic record <package> done` as the next step. Do
-not stage, commit or push unless the developer asks.
+log alone and name `/banzai:epic record <package> done` as the next step.
+Show a command the developer is to type in a `text` code block, not a `bash`
+one: it goes into the message box, and the shell does not know it. Do not
+stage, commit or push unless the developer asks.

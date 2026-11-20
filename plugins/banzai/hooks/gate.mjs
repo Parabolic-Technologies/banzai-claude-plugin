@@ -43,7 +43,7 @@ const APPROVAL_IN_COMPOUND = new RegExp(`(^|[;&|(\\n]\\s*)(:\\s*)?${APPROVAL_NAM
 const MAX_UNAPPROVED = 1000;
 const MAX_SHOWN = 30;
 const MAX_WORKS = 8;
-// The host's dialog shows up to twelve rows of the hook's text, its own first
+// A terminal's dialog shows up to twelve rows of the hook's text, its own first
 // row included, and folds the rest. In a terminal of 80 columns a row holds 72
 // characters, so five such lines leave room for three file names.
 const MAX_SUMMARY_LINES = 5;
@@ -159,7 +159,7 @@ function onFileWrite(payload, root, session) {
   if (session.entry === 'feature') {
     return decision('deny', `Planned work starts with a plan. Write documentation/work/<work>/plan.md with a file tool first, then run exactly this shell command, alone: ${approvalCommand('<work>')}`);
   }
-  return decision('ask', `This session has no typed /banzai:fix or /banzai:feature command. Answering "Yes" allows this one change to ${rel}.`);
+  return decision('ask', `This session has no typed /banzai:fix or /banzai:feature command. Allowing it permits this one change to ${rel}.`);
 }
 
 // Before a shell or MCP call. `request` is what the developer's answer will mean.
@@ -191,13 +191,13 @@ function onToolCall(payload, root, session) {
       return decision('deny', `The plan of work "${work}" needs exactly one "## For approval" section: one to ${MAX_SUMMARY_LINES} lines, each of at most ${MAX_SUMMARY_WIDTH} characters, that say what will be built and name each choice the developer did not make. The approval dialog shows exactly these lines to the developer. Add or shorten the section, then run: ${approvalCommand(work)}`);
     }
     request.approval = { work, files };
-    // What the developer must read comes first: the dialog folds a long text.
+    // The plan's lines come first: the desktop app shows about three rows.
     output = decision('ask', [
-      `Approval requested for work "${work}". Its plan says:`,
       ...summary,
-      '"Yes" approves these files until one of them changes:',
+      `Approval requested for work "${work}".`,
+      'Allowing this command approves these files until one of them changes:',
       ...bulleted(files.map((file) => file.path)),
-      'Not approved until the developer answers "Yes" here.'
+      'Not approved until the developer allows it here.'
     ].join('\n'));
   } else if (APPROVAL_IN_COMPOUND.test(command)) {
     return decision('deny', `Run the approval command alone, on one line, with nothing before or after it: ${approvalCommand('<work>')}`);
@@ -210,7 +210,7 @@ function onToolCall(payload, root, session) {
       output = decision('ask', [
         'Tool calls in this session changed source files without the developer\'s approval:',
         ...listed(session.unapproved),
-        'They are not accepted until the developer answers "Yes" here. "Yes" accepts them and runs this command.'
+        'They are not accepted until the developer allows this command. Allowing it accepts them and runs it.'
       ].join('\n'));
     } else {
       return decision('deny', `Tool calls in this session changed source files without the developer's approval: ${session.unapproved.slice(0, 5).join(', ')}${session.unapproved.length > 5 ? ' and more' : ''}. The developer accepts them in the dialog of a shell command. Run one, for example: git status`);
@@ -225,7 +225,7 @@ function onToolCall(payload, root, session) {
     failure = error.message;
   }
   // A call the gate cannot follow must not run unseen.
-  if (failure) return decision(isShell && !match ? 'ask' : 'deny', `The banzai gate could not record this tool call (${failure}), so its changes would not be compared.${isShell && !match ? ' Answering "Yes" runs it anyway.' : ''}`);
+  if (failure) return decision(isShell && !match ? 'ask' : 'deny', `The banzai gate could not record this tool call (${failure}), so its changes would not be compared.${isShell && !match ? ' Allowing it runs the command anyway.' : ''}`);
   return output;
 }
 
@@ -317,7 +317,7 @@ if (payload && typeof payload === 'object') {
     // A broken gate must not open silently: before a tool runs, stop or ask.
     if (payload.hook_event_name === 'PreToolUse') {
       const canAsk = payload.tool_name === 'Bash' || FILE_TOOLS.has(payload.tool_name);
-      emit(decision(canAsk ? 'ask' : 'deny', `The banzai gate failed (${error && error.message}).${canAsk ? ' Answering "Yes" allows this one tool call.' : ''}`));
+      emit(decision(canAsk ? 'ask' : 'deny', `The banzai gate failed (${error && error.message}).${canAsk ? ' Allowing it permits this one tool call.' : ''}`));
     }
   }
 }

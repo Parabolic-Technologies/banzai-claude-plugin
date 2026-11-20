@@ -192,11 +192,13 @@ too.
   beforehand. The hook finds it by comparing the project before and after
   the call, and the next shell command shows you the changed files and asks.
   "No" does not undo the change: revert it yourself. Until you accept it,
-  each shell command asks again and MCP calls are refused.
+  each shell command asks again and MCP calls are refused, except the
+  desktop app's own task list and summary.
 
 The approval dialog shows up to five lines of at most 72 characters from the
-plan's "For approval" section. When the list of approved files is long, the
-terminal folds its end out of view.
+plan's "For approval" section, and they come first in its text. When the
+list of approved files is long, the terminal folds its end out of view. The
+desktop app shows about three rows of the text and scrolls the rest.
 
 The hook behaves the same in every permission mode, `bypassPermissions`
 included.

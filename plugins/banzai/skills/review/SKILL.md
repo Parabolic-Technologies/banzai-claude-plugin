@@ -137,7 +137,9 @@ raised again without new evidence.
 Tell the developer the verdict and list the findings, worst first, each in
 one line with its location. Do not fix anything. The developer decides which
 findings to act on: `/banzai:fix <findings>` applies them, and
-`/banzai:feature <work>` is the way when a fix changes the plan.
+`/banzai:feature <work>` is the way when a fix changes the plan. Show a
+command the developer is to type in a `text` code block, not a `bash` one:
+it goes into the message box, and the shell does not know it.
 
 When claims were not checked, name each one with its system and ask the
 developer whether to check them live. Call no such system before the

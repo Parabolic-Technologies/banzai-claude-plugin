@@ -186,3 +186,5 @@ Gate 2:
   pass it to a command as an option.
 - End every mode with the epic's path, the files written or "none", and the
   next step.
+- Show a command the owner is to type in a `text` code block, not a `bash`
+  one: it goes into the message box, and the shell does not know it.

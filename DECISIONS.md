@@ -70,6 +70,11 @@ remembered and shown to the developer, and the next shell command asks with
 the list; "Yes" accepts what the dialog showed. An MCP call is denied until
 then, because only the shell's dialog is known to show the hook's text. A call
 that cannot be compared counts as a change.
+The hook's matcher leaves out the desktop app's own turn tools,
+`mcp__ccd_turn__*`, which draw its task list and its end-of-turn summary.
+Seen on 2026-11-20: with an unaccepted change in the session, the hook
+refused the app's summary call and the summary failed. Every other MCP tool
+is still compared, and refused until the developer accepts the change.
 Cost: about 80 ms per call on a small repository, and an estimated 130 to
 160 ms on one with 7,000 tracked files. Not seen: projects outside
 Git, ignored files, and changes by background processes after the call ends.
@@ -188,7 +193,15 @@ hashed file: changing them ends the approval. The host's dialog shows up to
 twelve rows of a hook's text, its own first row included, fewer in a short
 terminal, and folds the rest. At 80 columns a row holds 72 characters, so
 five such lines, the hook's other three rows and three file names fit.
-Not checked: the desktop app and the IDE extensions.
+Seen on 2026-11-20 in the desktop app: its dialog shows about three rows of
+the hook's text above a scroll bar, drops the line breaks, and names its
+buttons "Allow once" and "Deny". So the quoted lines come first in the
+hook's text, before the work's name, and the text names no button. The
+skill also asks for a tool call description that says what is approved: the
+desktop app shows that line in full. Sonnet and Opus wrote it in three runs
+of that day, and kept a fourth wording of the chat summary in their
+reasoning again.
+Not checked: the IDE extensions.
 Rejected: a stop before the dialog for a summary in chat, which makes two
 steps of one click; leaving the developer to open `plan.md` first.
 After an independent review of this change, two cases that happen by

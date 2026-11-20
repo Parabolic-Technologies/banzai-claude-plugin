@@ -55,7 +55,15 @@ so write them for a reader who sees nothing else. A plan has exactly one
 such section, and it holds one to five lines of at most 72 characters each,
 because the dialog folds a longer text; the hook refuses the approval
 request otherwise. Put related choices on one line when there are more than
-four, and write "No choices of my own." when there are none.
+four, and write "No choices of my own." when there are none. Put what
+matters most in the first line: the desktop app shows about three rows of
+the dialog's text without scrolling.
+
+When you change a plan the developer approved before, put a line first that
+says what changed since that approval, such as `Changed: retries are capped
+at three (review F2).` The dialog shows no difference between two plans, so
+this line is how the developer sees it. The lines after it still cover the
+whole plan, within the same five.
 
 Leave out the "Requirements" or "Decisions" line and any other section that
 would be empty. Link a decision record by its path under `decisions/`, as above:
