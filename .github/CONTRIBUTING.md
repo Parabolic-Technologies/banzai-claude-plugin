@@ -25,8 +25,8 @@ directly.
 
 ## Development
 
-The repository has no dependencies and no build step. Use Node.js 26 LTS,
-the one version the project tests on.
+The repository has no dependencies and no build step. Use Node.js 22 or
+later; CI runs the tests on Node.js 22, 24 and 26.
 
 ```bash
 npm test
@@ -48,6 +48,21 @@ The first command runs every test. The next two check the marketplace
 manifest, the plugin's manifest and the skills. The last one starts Claude
 Code with your working copy of the plugin in a new, empty Git project; type
 `/banzai:setup` there to switch the hook on.
+
+The behaviour of the commands has its own check, which CI does not run:
+
+```bash
+npm run eval
+```
+
+It runs the cases in `plugins/banzai/evals/` through `claude plugin eval`:
+real Claude Code runs of the commands in a small scratch project, graded by
+the files and the tool calls they leave. It needs a signed-in Claude Code,
+takes about five minutes and costs about 1.20 USD on Sonnet. Add
+`-- --case <name>` to run one case. Keep the machine awake while it runs: a
+run on a sleeping machine times out (on macOS, `caffeinate -is npm run
+eval`). Run it after a change to a skill text or
+to the hook's decisions, or say in the pull request that you did not.
 
 The project keeps itself small on purpose. These limits are part of the design:
 

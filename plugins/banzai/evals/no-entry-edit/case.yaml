@@ -1,0 +1,20 @@
+schema_version: "1.1"
+name: no-entry-edit
+description: With no typed entry command the hook asks before a source write, so a run with nobody to answer changes no source file.
+tags: [gate]
+runs: 1
+context:
+  scaffold_script: scaffold.sh
+execution:
+  prompt: "Use the Edit tool to change src/greet.mjs so that the greeting ends with a period instead of an exclamation mark. If the edit is refused, stop and report the refusal; do not change the file another way."
+  max_turns: 15
+  timeout_seconds: 300
+  allowed_tools: [Read, Glob, Grep]
+graders:
+  - name: tried-the-edit
+    type: tool_used
+    tool: Edit
+  - name: source-unchanged
+    type: regex
+    target: { source: file, path: src/greet.mjs }
+    pattern: 'Hello, \$\{name\}!`'

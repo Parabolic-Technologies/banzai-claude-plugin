@@ -1,0 +1,25 @@
+schema_version: "1.1"
+name: fix-period
+description: A typed /banzai:fix changes one source file and its test in a project the hook guards.
+tags: [fix]
+runs: 1
+context:
+  scaffold_script: scaffold.sh
+execution:
+  prompt: "/banzai:fix the greeting must end with a period instead of an exclamation mark; update the test too"
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Read, Glob, Grep, Skill, TodoWrite]
+graders:
+  - name: source-ends-with-period
+    type: regex
+    target: { source: file, path: src/greet.mjs }
+    pattern: 'Hello, \$\{name\}\.`'
+  - name: test-expects-period
+    type: regex
+    target: { source: file, path: test/greet.test.mjs }
+    pattern: 'Hello, Ada\.'
+  - name: ran-the-tests
+    type: tool_used
+    tool: Bash
+    input_match: 'npm test'

@@ -4,6 +4,43 @@ All notable changes to the Banzai plugin are listed here. Versions follow
 [Semantic Versioning](https://semver.org/). A change to a command name, to
 the hook's decisions or to the document layout is a breaking change.
 
+## 1.2.0 - 2026-11-22
+
+### Added
+
+- A size limit for source and test files in planned work: the one your
+  `CLAUDE.md` or `AGENTS.md` names, or 500 lines. A plan keeps files within
+  it, and a file that is already past it does not get longer: new code
+  goes into another file, or the file is split first. The audits of
+  `/banzai:auto` check it, and a breach in a finished change is a major
+  finding there and in `/banzai:review`. Files that a tool generates and
+  data files are exempt.
+- `/banzai:setup` offers to record a size limit in your instructions file.
+  It also recommends a linter when the project has none: the commands that
+  install and run it and a starting configuration that limits the size of
+  a file and the complexity and length of a function. When the project's
+  linter lacks such a limit or only warns, it shows the lines that set it.
+  It installs no linter and changes no configuration.
+- When the hook does not run, because hooks are switched off or Node.js is
+  missing, `/banzai:feature` says so and asks you to approve the plan in a
+  question dialog. That approval is not recorded, nothing is held back,
+  and a run with nobody to answer stops before it changes source.
+
+### Changed
+
+- A source change that waits for your acceptance is shown in the dialog of
+  the next MCP tool call as well as of the next shell command, and allowing
+  the call accepts it. Before, MCP calls were refused until you had
+  accepted it. A `Monitor` or `PowerShell` call is still refused.
+- The README names Node.js 22 or later as the minimum, where it named
+  Node.js 26 LTS. The tests run on Node.js 22, 24 and 26.
+- After `/banzai:auto`, and after `/banzai:fix` while no planned work is
+  attached, the hook no longer compares the project around a shell command
+  or an MCP call, because every change passes there. A call takes about 30
+  to 50 ms less.
+- The plugin's description and the README lead with what a piece of work
+  leaves in your repository.
+
 ## 1.1.0 - 2026-11-20
 
 ### Added

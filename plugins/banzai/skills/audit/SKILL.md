@@ -45,6 +45,10 @@ a copy: that is the next step's work, and the change audit checks it.
    choice that many parts of the code will have to follow. Report such a
    decision as a `blocker` whose summary starts with "Needs the
    developer:".
+7. Size: no task takes a source or test file past the project's size limit
+   (the one in `CLAUDE.md` or `AGENTS.md`, or 500 lines when neither names
+   one), and none leaves a file that is already past it longer than it was
+   before the work. Files that a tool generates and data files are exempt.
 
 For a finding about the plan, the evidence is the quoted lines of the plan
 next to the quoted request, requirement or code they conflict with.
@@ -70,6 +74,9 @@ check them, do not trust them.
 8. Fit: the change reuses what the project already has, adds no unused
    generality and leaves no fact stale in a document, `CLAUDE.md` or
    `AGENTS.md`.
+9. Size: the change took no source or test file past the project's size
+   limit, as the plan audit defines it, and left no file that was already
+   past it longer than it was before the work. Report either as `major`.
 
 When the work directory has a `review.md`, check the findings of its change
 reviews first: say for each one whether it is closed or still open, with the

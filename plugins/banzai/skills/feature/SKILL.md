@@ -77,8 +77,10 @@ developer did not make: the decisions tagged `default` in `requirements.md`,
 or, in a plan without that file, each part of Goal that the request did not
 state.
 
-Then show the approval dialog. Run exactly this shell command, alone, with
-nothing added:
+Then show the approval dialog. The hook reads `plan.md` at the moment the
+command starts, so the plan's write must have returned before you send the
+command: never put it in the same message as a write. Run exactly this shell
+command, with nothing added:
 
 ```bash
 : banzai-request-approval <work>
@@ -102,11 +104,20 @@ Do not change source files before the developer has answered "Yes".
   approved, so stop and say that the plan waits for the developer's
   approval; do not run the command again. Any other message says what to
   correct first.
+- The command returns and no hook message follows: the hook is not running
+  in this session. Nothing guards the source files, and nothing was
+  approved or recorded. Say so in one line. Then ask for the approval in
+  the session's question dialog (the `AskUserQuestion` tool): the developer
+  sees the dialog alone, so put the lines of "For approval" and the plan's
+  path into the question itself, and offer "Approve" and "Change the plan".
+  Go on only after "Approve", and ask again whenever the plan changes.
+  Where the session has no such dialog, or nobody answers it, stop and say
+  that the plan waits for the developer's approval.
 
-After "Yes", do not edit `requirements.md`, `plan.md` or a linked decision
-record, not even to tick a task: progress goes into `report.md`. When the
-work turns out to need a different plan, stop, change the plan, say what
-changed and run the approval command again.
+After the approval, do not edit `requirements.md`, `plan.md` or a linked
+decision record, not even to tick a task: progress goes into `report.md`.
+When the work turns out to need a different plan, stop, change the plan, say
+what changed and run the approval command again.
 
 When the hook denies a source change, its message says why. Do what the
 message says; do not look for another way to make the change.

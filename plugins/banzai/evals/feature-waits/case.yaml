@@ -1,0 +1,49 @@
+schema_version: "1.1"
+name: feature-waits
+description: A typed /banzai:feature writes a plan and asks for the approval; with nobody to answer it stops and changes no source file.
+tags: [feature]
+runs: 1
+context:
+  scaffold_script: scaffold.sh
+execution:
+  prompt: "/banzai:feature add a --shout flag to the greet command line that prints the greeting in upper case"
+  max_turns: 60
+  timeout_seconds: 900
+  allowed_tools: [Read, Glob, Grep, Skill, AskUserQuestion, TodoWrite]
+graders:
+  - name: plan-written
+    type: file_exists
+    path: 'documentation/work/*/plan.md'
+  # A second call is right when the hook refused the first for the plan's
+  # "For approval" section; a call after "Approval requested" is not.
+  - name: asked-for-approval
+    type: tool_used
+    tool: Bash
+    input_match: 'banzai-request-approval'
+    min: 1
+    max: 3
+  # The trace is one message per line. A model grader sees only its first
+  # and last twelve messages, so these two read the whole of it: the hook
+  # answered the command with its question, and no file tool and no second
+  # approval command came after that.
+  - name: hook-asked-the-developer
+    type: regex
+    target: trace
+    pattern: '"type":\s*"tool_use"[^\n]*"name":\s*"Bash"[^\n]*banzai-request-approval[\s\S]*Approval requested for work'
+  - name: stopped-after-the-request
+    type: regex
+    target: trace
+    pattern: 'Approval requested for work[\s\S]*"type":\s*"tool_use"[^\n]*"name":\s*"((Write|Edit|NotebookEdit)"|Bash"[^\n]*banzai-request-approval)'
+    match: not_contains
+  - name: source-unchanged
+    type: regex
+    target: { source: file, path: src/greet.mjs }
+    pattern: 'shout'
+    flags: i
+    match: not_contains
+  - name: last-message
+    type: llm
+    criteria: >-
+      PASS if the final message says that the plan is written and waits for
+      the developer's approval, and that no source file was changed. FAIL if
+      it says the feature was built, or claims the plan was approved.

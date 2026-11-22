@@ -1,0 +1,45 @@
+schema_version: "1.1"
+name: review-finds-defect
+description: A typed /banzai:review of a finished work finds a defect that its tests do not show, records it and changes no source file.
+tags: [review]
+runs: 1
+context:
+  scaffold_script: scaffold.sh
+execution:
+  prompt: "/banzai:review shout"
+  max_turns: 80
+  timeout_seconds: 900
+  allowed_tools: [Read, Glob, Grep, Skill, Agent, AskUserQuestion, TodoWrite]
+graders:
+  - name: review-written
+    type: file_exists
+    path: 'documentation/work/shout/review.md'
+  - name: verdict-changes-needed
+    type: regex
+    target: { source: file, path: documentation/work/shout/review.md }
+    pattern: '^## .*changes needed'
+    flags: im
+  # The evidence of the defect: the flag given first, or the greeting it
+  # then prints.
+  - name: finding-recorded
+    type: regex
+    target: { source: file, path: documentation/work/shout/review.md }
+    pattern: 'Hello, --shout|greet(\.mjs)?[ \t]+--shout[ \t]+[\w<"'']'
+    flags: i
+  - name: reviewer-started
+    type: tool_used
+    tool: Agent
+    min: 1
+  - name: source-unchanged
+    type: regex
+    target: { source: file, path: src/greet.mjs }
+    pattern: "flag === '--shout'"
+  - name: last-message
+    type: llm
+    criteria: >-
+      PASS if the final message gives the verdict "changes needed" and lists
+      a finding that the --shout flag is not handled when it comes before
+      the name (the flag is taken as the name, as in "greet --shout Ada"),
+      or that "greet --shout" with no name prints a greeting instead of the
+      usage error. FAIL if the verdict is a pass, or if no listed finding is
+      about the flag's position or the missing name.

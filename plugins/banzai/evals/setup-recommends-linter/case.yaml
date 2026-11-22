@@ -1,0 +1,47 @@
+schema_version: "1.1"
+name: setup-recommends-linter
+description: A typed /banzai:setup prepares a fresh project and recommends a linter without installing one.
+tags: [setup]
+runs: 1
+context:
+  scaffold_script: scaffold.sh
+execution:
+  prompt: "/banzai:setup"
+  max_turns: 60
+  timeout_seconds: 900
+  allowed_tools: [Read, Glob, Grep, Skill, Agent, AskUserQuestion, TodoWrite]
+graders:
+  - name: work-directory-created
+    type: file_exists
+    path: 'documentation/work/.gitkeep'
+  - name: decisions-index-created
+    type: file_exists
+    path: 'documentation/decisions/README.md'
+  - name: nothing-installed
+    type: regex
+    target: { source: file, path: package.json }
+    pattern: 'devDependencies|"lint"'
+    match: not_contains
+  - name: no-install-command
+    type: tool_used
+    tool: Bash
+    input_match: '\b(npm (i|install|add)|pnpm add|yarn add)\b'
+    min: 0
+    max: 0
+  # The three below read the last message, which shows the configuration.
+  # They know how ESLint spells a rule and a severity.
+  - name: file-length-limit-is-an-error
+    type: regex
+    pattern: 'max-lines\W?\s*:\s*\[?\s*\W?(error|2)\b'
+  - name: complexity-limit-is-an-error
+    type: regex
+    pattern: 'complexity\W?\s*:\s*\[?\s*\W?(error|2)\b'
+  - name: function-length-limit-is-an-error
+    type: regex
+    pattern: 'max-lines-per-function\W?\s*:\s*\[?\s*\W?(error|2)\b'
+  - name: linter-recommended
+    type: llm
+    criteria: >-
+      PASS if the final message recommends a specific linter by name and
+      gives a command that installs it and a command that runs it. FAIL if
+      it names no linter, or only says that a lint command is missing.

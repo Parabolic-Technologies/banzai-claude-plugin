@@ -75,6 +75,11 @@ Brief for the reviewer:
 > 8. Fit: the change reuses what the project already has, adds no unused
 >    generality and leaves no fact stale in a document, `CLAUDE.md` or
 >    `AGENTS.md`.
+> 9. Size: the change took no source or test file past the project's size
+>    limit (the one in `CLAUDE.md` or `AGENTS.md`, or 500 lines when neither
+>    names one), and left no file that was already past it longer than it
+>    was before the work. Files that a tool generates and data files are
+>    exempt. Report either as `major`.
 >
 > Report findings only. A finding needs all four: exact evidence (a command
 > with its output, or the quoted code), a location as `file:line`, the

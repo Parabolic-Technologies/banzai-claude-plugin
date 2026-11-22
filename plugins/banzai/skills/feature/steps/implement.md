@@ -16,6 +16,14 @@ now; the code is where the work happens.
   default in place of a failed result, weaken or skip a test, or change an
   expected value so that a check passes. A failure you cannot fix is
   reported as a failure.
+- Keep source and test files within the project's size limit: the one its
+  `CLAUDE.md` or `AGENTS.md` names, or 500 lines when neither names one.
+  Files that a tool generates and data files are exempt. Count the lines of
+  a file before you change it. When a task as written would take a file
+  past the limit, or leave a file that is already past it longer than it
+  was before the work, put the new code in another file, keep every public
+  contract the plan fixes, and go on. When the plan named the file, record
+  that under "Deviations" in the report.
 - Follow every decision record the plan links to. Its "Decision" and
   "Consequences" sections bind the code.
 - Match the code around the change: naming, error handling, structure and
@@ -52,5 +60,7 @@ denies source changes.
 
 In a Git repository the hook compares the project's source before and after
 every shell command and reports a change it would not have allowed to the
-developer. Change source files with the file tools. Use the shell for what it is needed for:
-running checks, formatters, generators and package managers.
+developer. After `/banzai:auto` it does not compare, because every change
+passes there. Either way, change source files with the file tools. Use the
+shell for what it is needed for: running checks, formatters, generators and
+package managers.

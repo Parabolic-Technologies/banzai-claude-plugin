@@ -15,7 +15,12 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-24.04
-    container: node:26.13.1-bookworm
+    strategy:
+      fail-fast: false
+      matrix:
+        # From the oldest Node.js line the README names to the newest LTS.
+        node: ['22.20.0', '24.11.1', '26.13.1']
+    container: node:${{ matrix.node }}-bookworm
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6

@@ -1,0 +1,43 @@
+schema_version: "1.1"
+name: auto-shout
+description: A typed /banzai:auto plans, builds, audits and reports a small feature with no approval.
+tags: [auto]
+runs: 1
+context:
+  scaffold_script: scaffold.sh
+execution:
+  prompt: "/banzai:auto add a --shout flag to the greet command line that prints the greeting in upper case"
+  max_turns: 150
+  timeout_seconds: 2400
+  allowed_tools: [Read, Glob, Grep, Skill, Agent, AskUserQuestion, TodoWrite]
+graders:
+  - name: plan-written
+    type: file_exists
+    path: 'documentation/work/*/plan.md'
+  - name: report-written
+    type: file_exists
+    path: 'documentation/work/*/report.md'
+  - name: review-written
+    type: file_exists
+    path: 'documentation/work/*/review.md'
+  - name: source-has-flag
+    type: regex
+    target: { source: file, path: src/greet.mjs }
+    pattern: '--shout'
+  - name: audit-ran-twice
+    type: tool_used
+    tool: Skill
+    input_match: 'banzai:audit'
+    min: 2
+  - name: no-approval-command
+    type: tool_used
+    tool: Bash
+    input_match: 'banzai-request-approval'
+    min: 0
+    max: 0
+  - name: last-message
+    type: llm
+    criteria: >-
+      PASS if the final message says what was built, names the plan, and
+      reports the result of the tests and of the two audits. FAIL if it says
+      the work is blocked, waits for an approval, or is unfinished.

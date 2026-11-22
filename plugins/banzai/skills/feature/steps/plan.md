@@ -84,6 +84,13 @@ the approval then covers that record too.
 - Use the simplest design that satisfies the requirements and the accepted
   decisions. Add an abstraction or a dependency only for a benefit you can
   name.
+- Keep source and test files within the project's size limit: the one its
+  `CLAUDE.md` or `AGENTS.md` names, or 500 lines when neither names one.
+  When a task would take a file past the limit, or leave a file that is
+  already past it longer than it was before the work, the task puts the new
+  code in another file, or an earlier task, which serves the same
+  requirement, splits the file. Files that a tool generates and data files
+  are exempt.
 - A new dependency, or a choice listed in the design step, needs an accepted
   decision record before the plan relies on it. Do not repeat a record's
   reasoning in the plan; link it.

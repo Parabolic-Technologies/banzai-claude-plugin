@@ -51,6 +51,42 @@ test('a session that may change source is not asked about shell changes', () => 
   assert.equal(shell(root, 'ls').decision, null);
 });
 
+test('a session whose changes pass anyway is not compared, until it stops being one', () => {
+  const root = gitRepo();
+  const stored = () => {
+    try {
+      return fs.readdirSync(path.join(dataOf(root), 'sessions/s1')).length;
+    } catch {
+      return 0;
+    }
+  };
+  shell(root, 'ls');
+  assert.equal(stored(), 1, 'with no entry command the call is compared');
+  for (const name of ['banzai:fix', 'banzai:auto']) {
+    entry(root, name, 'something');
+    shell(root, 'ls');
+    assert.equal(stored(), 1, name);
+    assert.equal(call(root, () => put(root, 'src/base.js', `${name}\n`)).note, '', name);
+  }
+
+  // A plan written while a call runs attaches the session to that work. The
+  // call was not compared, so it counts as a change.
+  entry(root, 'banzai:fix', 'something');
+  const running = shell(root, 'ls');
+  put(root, 'documentation/work/demo/plan.md', '# Plan\n' + SUMMARY);
+  post(root, 'Write', { file_path: path.join(root, 'documentation/work/demo/plan.md') }, 'w1');
+  assert.match(post(root, 'Bash', {}, running.id).additionalContext, /could not be compared/);
+  assert.match(shell(root, 'ls').reason, /\(a tool call could not be compared\)/);
+
+  // The same holds when /banzai:feature is typed while a call runs, even
+  // though that call changed nothing.
+  const other = gitRepo();
+  entry(other, 'banzai:fix', 'something');
+  const open = shell(other, 'ls');
+  entry(other, 'banzai:feature', 'something new');
+  assert.match(post(other, 'Bash', {}, open.id).additionalContext, /could not be compared/);
+});
+
 test('without an entry command a shell change is asked about', () => {
   const root = gitRepo();
   assert.match(call(root, () => put(root, 'src/base.js', 'x\n')).note, /src\/base\.js/);
@@ -119,15 +155,26 @@ test('a typed entry command starts over', () => {
   assert.equal(shell(root, 'ls').decision, null);
 });
 
-test('MCP tools are compared, and the shell takes the question', () => {
+test('MCP tools are compared, and an MCP call asks as a shell command does', () => {
   const root = gitRepo('demo');
   entry(root, 'banzai:feature', 'demo');
   const tool = 'mcp__editor__replace_content';
-  assert.match(call(root, () => put(root, 'src/base.js', 'via mcp\n'), { tool }).note, /src\/base\.js/);
-  const denied = pre(root, 'mcp__docs__search', { query: 'x' });
-  assert.equal(denied.decision, 'deny');
-  assert.match(denied.reason, /src\/base\.js.*Run one, for example: git status$/);
-  assert.equal(shell(root, 'git status').decision, 'ask');
+  assert.match(call(root, () => put(root, 'src/base.js', 'via mcp\n'), { tool }).note, /src\/base\.js.*next shell command or MCP tool call/);
+
+  // A tool whose dialog is not known to show the hook's text is sent to the shell.
+  for (const other of ['Monitor', 'PowerShell']) {
+    const denied = pre(root, other, { command: 'x' });
+    assert.equal(denied.decision, 'deny', other);
+    assert.match(denied.reason, /src\/base\.js.*Run one, for example: git status$/);
+  }
+
+  const asked = pre(root, 'mcp__docs__search', { query: 'x' });
+  assert.equal(asked.decision, 'ask');
+  assert.match(asked.reason, /\n {2}• src\/base\.js\n.*allows this tool call/);
+  assert.equal(shell(root, 'git status').decision, 'ask', 'no answer yet');
+  post(root, 'mcp__docs__search', { query: 'x' }, asked.id);
+  assert.equal(shell(root, 'git status').decision, null, '"Yes" accepted the change');
+  assert.equal(pre(root, 'mcp__docs__search', { query: 'x' }).decision, null);
 });
 
 test('the hook is registered for the tools that can change files, and no others', () => {

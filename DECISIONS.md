@@ -70,19 +70,40 @@ compares source before and after each call: the files Git lists as changed or
 untracked and those it was told to skip, with what the work tree, the index
 and the commit hold. A change the file-tool rules would not have passed is
 remembered and shown to the developer, and the next shell command asks with
-the list; "Yes" accepts what the dialog showed. An MCP call is denied until
-then, because only the shell's dialog is known to show the hook's text. A call
-that cannot be compared counts as a change.
+the list; "Yes" accepts what the dialog showed. Until 2026-11-22 an MCP call
+was denied until then, because only the shell's dialog was known to show the
+hook's text. A call that cannot be compared counts as a change.
 The hook's matcher leaves out the desktop app's own turn tools,
 `mcp__ccd_turn__*`, which draw its task list and its end-of-turn summary.
 Seen on 2026-11-20: with an unaccepted change in the session, the hook
 refused the app's summary call and the summary failed. Every other MCP tool
-is still compared, and refused until the developer accepts the change.
+is still compared.
+Since 2026-11-21 a call is not compared in a session whose source changes
+pass whatever the project holds: after `/banzai:auto`, and after
+`/banzai:fix` while no planned work is attached. Nothing found there would be
+held back, so the hook keeps no record of the call, and it no longer asks
+about a call it cannot record. When the session's changes no longer pass by
+the end of a call, because a planned work was attached to it or
+`/banzai:feature` was typed while the call ran, that call was not compared
+and counts as a change, even if it changed nothing.
+Since 2026-11-22 an MCP call asks as a shell command does, with the same
+list, and allowing it accepts the list. It also asks, where it was denied,
+when the hook cannot record the call or fails. Seen on Claude Code 2.1.330
+in a terminal: the dialog of an MCP tool shows the hook's text in full, in
+the modes `default` and `auto` and when a rule already allows the tool, and
+the host reports the call afterwards under the same id. `Monitor` and
+`PowerShell` are still denied and sent to the shell, because their dialogs
+were not seen. Not checked: the desktop app's dialog for an MCP tool, and
+the mode `bypassPermissions`.
 Cost: about 80 ms per call on a small repository, and an estimated 130 to
-160 ms on one with 7,000 tracked files. Not seen: projects outside
+160 ms on one with 7,000 tracked files. Where the call is not compared it is
+about 30 ms less on a small repository and about 50 ms less with 7,000
+tracked files, measured on 2026-11-21. Not seen: projects outside
 Git, ignored files, and changes by background processes after the call ends.
 Rejected: asking before every shell command; parsing commands for writes;
-hashing every tracked file.
+hashing every tracked file; letting MCP calls pass while a change is
+unaccepted, which leaves nothing to stop a tool that edits source through
+MCP.
 
 ## 2026-11-17: State files are sealed
 
@@ -358,3 +379,249 @@ could switch a team's approval off; removing `disable-model-invocation` from
 `review` so that it could be called, because its description would load into
 every session and its text forbids fixes; questions at a later point of the
 run.
+
+## 2026-11-21: The commands' behaviour is checked with the host's `claude plugin eval`
+
+The plugin carries eight eval cases in `plugins/banzai/evals/`, run by
+`npm run eval`. Each starts a real run of one prompt in a small project that
+a scaffold script builds, and is graded by the files the run left, by its
+tool calls and, in six cases, by a model that reads the last message. A typed
+`/banzai:fix` changes a source file and its test. A file-tool write with no
+entry command changes nothing. `/banzai:feature` writes a plan, asks for the
+approval and stops. `/banzai:auto` writes its documents, has both audits run
+and never runs the approval command. `/banzai:auto` in a project whose main
+source file is past the size limit builds the change and leaves that file
+no longer than it was. `/banzai:review` of a finished work
+that misses a requirement its tests do not cover starts the reviewer,
+records the defect with the verdict `changes needed` and changes no source
+file. `/banzai:setup` in a project that was never set up creates the work
+directory and the decisions index, recommends a linter and installs none.
+In a project whose linter only warns about complexity, it shows the lines
+that set the limits as errors and leaves the configuration as it is.
+Reason: the tests cover the hook only, and how the commands behave was
+checked by hand on the day a text changed, so a new model or host release
+could break a command unnoticed.
+Seen on Claude Code 2.1.330 with Sonnet: an eval run executes the plugin's
+hooks; a prompt that starts with an entry command raises the expansion event
+as a typed command does; the run's permission mode, `dontAsk`, returns the
+hook's `ask` to the model as a refusal with the hook's text; and the forked
+audit runs as the plugin's agent and returns in the same turn. The eight
+cases take about five minutes and 1.20 USD. A run needs the machine awake:
+on 2026-11-22 three runs of one case stopped in the middle of an answer
+while the Mac slept, and timed out.
+Seen on 2026-11-22 with other models and repeated runs: one run of the
+eight on Haiku passed every case, for 0.34 USD. Three runs on Sonnet passed
+every case but one run of `setup-linter-only-warns`, whose skill text was
+then changed (see the entry on the linter). One run on Opus cost 3.29 USD
+and passed seven cases. In `feature-waits` the run was right and a grader
+was wrong: the hook refused the first approval command for the plan's "For
+approval" section, Opus shortened the section, ran the command again and
+stopped, and two of three model graders, which saw the trace with its
+middle left out, voted that it had not stopped. Two patterns over the whole
+trace replaced that grader, and the case then passed on Opus. A fourth and
+a fifth run on Sonnet, the fifth on the texts and graders as they stand,
+passed all eight.
+Limits: in the run's sandbox the model and the reviewer have no `git`, so
+the audits see no diff. No grader runs a command, so that the project's
+tests pass is read from the tool call and the last message. A grader reads a
+file by its exact path and the name of a work holds the date, so the content
+of a plan is not graded. A grader sees which files a run created, not what
+changed in them. A model grader that reads the trace sees only its first
+and last twelve messages, so no case uses one: what a run did in the middle
+is graded by a pattern over the whole trace. The pattern in `feature-waits`
+knows the file tools by name, so a file written through the shell after the
+request passes it. The host takes a scaffold script from the case's own
+directory only, so each case has a three-line script that reads the shared
+`fixture.sh`. The run's permission mode refuses the write of
+`.claude/settings.json` and nobody answers a question, so the `setup` cases
+grade neither the settings file nor the lines for the instructions file.
+Their graders of the last message know how ESLint spells a rule and a
+severity, so a right report that recommends another tool fails them.
+The cases need a signed-in host and are not part of CI.
+Not checked: more than one run of a case on Opus or Haiku, a review of a
+work that has no defect, and the command `epic`.
+Rejected: a harness of our own around `claude -p`; cases outside the
+plugin's directory, where the host's command does not look; running them in
+CI, which needs an API key in a public repository.
+
+## 2026-11-21: Without the hook, `feature` asks for the approval in the question dialog
+
+When the approval command returns and no hook message follows, the `feature`
+step says that the hook is not running, then asks for the approval in the
+session's question dialog, with the plan's "For approval" lines and the
+plan's path in the question and the options "Approve" and "Change the plan".
+It goes on after "Approve". With no such dialog, or with nobody to answer
+it, it stops and says that the plan waits.
+Reason, seen on Claude Code 2.1.329 with the plugin's hooks removed, and
+with a hook command that fails as on a machine without Node.js: Sonnet and
+Opus wrote the plan, ran the command, got an empty result and stopped. None
+changed source, and each asked for a confirmation in chat that the skill did
+not describe, so without the hook the work could not be finished and what
+followed a reply was left to the model. In `acceptEdits` mode the host
+raised its own dialog for the command; it showed the tool call's description
+and the command, not the plan's lines.
+With the new text, on 2.1.330 with the hooks removed: in an interactive
+session Sonnet asked in the dialog with the lines and the path in the
+question, built and tested the change after "Approve", and stopped and asked
+what to change after "Change the plan". A headless session has no such
+dialog; Sonnet and Opus stopped there and changed no source.
+Limit: this approval binds nothing. No record is written, no file is hashed,
+a later change to the plan is not detected, and nothing holds the file tools
+back. It keeps the developer's reading of the plan before the code, and no
+more.
+The step also says why the approval command never shares a message with a
+write: the hook reads the plan when the command starts. In five of six
+runs on Sonnet without the hook the plan's write and the command had been
+sent in one message, three of them after the text asked for "the only tool
+call of its message". With the reason given, three runs of three sent them
+apart. By the hook's code, a command sent too early is refused for a
+missing plan, or its dialog quotes the plan as it was; this was not run.
+Not checked: Opus in an interactive session, the modes `default` and
+`acceptEdits` with the new text, and a failing hook command with the new
+text.
+Rejected: taking the silent return for "Yes"; stopping for good, which
+leaves the command useless where hooks are switched off or Node.js is
+missing; a confirmation typed in chat, which the model would have to
+interpret; the question dialog as a second way to approve while the hook
+runs, which is still not built.
+
+## 2026-11-22: A file that is past a size limit does not grow
+
+The plan step keeps source and test files within the project's size limit:
+the one its `CLAUDE.md` or `AGENTS.md` names, or 500 lines when neither
+names one. A task that would take a file past the limit, or leave a file
+that is already past it longer than it was before the work, puts the new
+code in another file, or an earlier task splits the file. Such a file may
+still change. The implement step keeps to the limit where a task as written
+would break it, keeps the public contracts the plan fixes, and records the
+move as a deviation when the plan named the file. Both audits of
+`/banzai:auto` and the reviewer of `/banzai:review` check it. A breach in
+a built change is a `major` finding, so `/banzai:auto` fixes it, unless
+the fix needs a different design, and the verdict of a review is `changes
+needed`: a finding left open is a warning, and a limit that only warns does
+not hold. `setup` offers to record a limit in the project's instructions:
+the one the project's linter sets on the length of a file, or 500 lines.
+Files that a tool generates and data files are exempt.
+Reason: an agent adds new code to the file that already owns the behaviour,
+and the rules "the smallest change", "no unrelated refactoring" and "reuse
+what the project has" keep it there, so a file grows a little with every
+piece of work and nothing in the skills pushed the other way. Test files
+are no exception. This repository's one test file of 920 lines ran in 31
+seconds; split into four files, the same 65 tests run in 11 seconds,
+because the test runner starts the files side by side and runs the tests
+of one file in turn.
+The rule first read "no new behaviour in a file that is already past the
+limit". Whether a change is new behaviour is a judgment; the length of a
+file is a count, which the implement step, an audit and a grader make the
+same way. Under the first wording a run changed an existing function in
+such a file, as its plan said, and left the file three lines shorter: a
+breach by the letter, and no growth. The runs below were made under the
+first wording, except the last.
+Seen with the eval case `auto-large-file` on Claude Code 2.1.330 with
+Sonnet, one run each, in a project that names no limit and whose main
+source file has 519 lines: without the rule the run wrote the new behaviour
+into that file; with it, the run moved the command line's parsing into a
+new file and said in its last message that the first file is over 500
+lines. In a second run with the rule the plan first put the behaviour into
+that file; the plan audit reported it and the plan was corrected before
+any code.
+Seen in a terminal session on Sonnet, where `/banzai:feature` continued a
+work whose approved plan named that file for both tasks: while the
+implement step only pointed at the limit of the plan step, which such a
+session never reads, the run wrote everything into that file and reported
+no deviation. With the limit stated in the implement step, the run counted
+the file's lines, wrote the command line's code into a new file, recorded
+the deviation and named the file as a follow-up; it still changed the
+existing function in that file, as the plan said, and the file ended three
+lines shorter.
+The eval case also passed in one run on Haiku and in one on Opus.
+Under the present wording, in one run of the case on Sonnet, the run wrote
+the command line's parsing into a new file, and the large file ended at 515
+lines. In a terminal session on Sonnet, `/banzai:feature` continued the
+same work as above: the run counted the file's lines, wrote the command
+line's code into a new file, changed the existing function in the large
+file, which ended at 516 lines, and recorded the deviation. The words
+"before the work", the clause on public contracts in the implement step and
+the limit `setup` takes from a linter came after these two runs, from a
+review. In one more run of the eval case, with those words in place, the
+plan split the file first: the templates went into two new files of 251
+lines each, the large file re-exports them and ended at 21 lines, and the
+run recorded as a deviation that the plan had named one new file, which
+would have had 503 lines.
+500 is a convention, not a measurement. A project sets its own number in
+its instructions.
+Rejected: rules in the skills on architecture, on paradigms or on a
+test-first order of work, which differ by project, belong in its
+instructions and decision records, and, for an order of work, cannot be
+checked from what a piece of work leaves; a limit that the hook enforces,
+which is a new mechanism and would refuse in the middle of a change; no
+default, which leaves a project that names no limit with none.
+Not checked: under the present wording, more than one run of each kind,
+Opus and Haiku, and a task whose new lines cannot move out of such a file;
+a move that would change a public contract; `setup` in a project whose
+linter limits the length of a file and whose instructions name no limit; a
+size finding in a change audit or a review, which no case produces;
+`/banzai:fix`, which has no such rule; `/banzai:feature`, whose plan no
+eval case grades; a project that names its own limit; a file that a task
+would take past the limit, as opposed to one already past it. In the one
+run of `setup` in a project that names no limit, the report offered a line
+with 500 lines for the instructions file.
+
+## 2026-11-22: `setup` recommends a linter and installs none
+
+When a project has no linter, `setup` names one in its report: a single
+tool that is standard for the project's main language, with the command
+that installs it, a minimal configuration and the command that runs it.
+Where the tool can, that configuration limits the length of a file to the
+project's size limit, and the complexity and the length of a function to
+the tool's default values, each as an error. Test files have no limit on
+the length of a function. The report says that code which already breaks
+a limit has to be split, or recorded as an exception, in the work that
+adds the linter. When the project has a linter whose configuration lacks
+one of these limits or sets one as a warning, the report names what is
+missing and shows the lines that set it; a limit the configuration already
+has keeps its value, and only its severity changes. `setup` installs no
+linter and changes no configuration.
+Reason: the test step runs the project's linter when there is one, so a
+project without one has no mechanical check of what the skills only ask
+for, and a linter that limits file length holds the size limit without a
+model. The file limit does not hold a function: a file within it can
+carry one function of several hundred lines. A model cannot count the
+branches of a function as a linter does, so these two limits go to the
+linter and not into the skills. Each limit is an error because the checks
+do not fail on a warning, and code grows past a limit that only warns. A
+test suite is often one function, so a limit on its length would measure
+the suite. Installing a linter adds a dependency and changes source
+files, which `setup` never does and which is planned work under
+`/banzai:feature`.
+Rejected: installing the linter in `setup`; naming tools in the skill's
+text, which would go stale and cannot cover every language; rules in the
+skills on the complexity or the length of a function; a limit on the
+depth of nesting or on the number of functions in a file, which add
+little to the other three.
+Seen with the eval case `setup-recommends-linter` on Claude Code 2.1.330
+with Sonnet, one run each, in a JavaScript project with no linter: without
+this text the report said only that it found no lint command; with it, the
+report recommended ESLint with the command that installs it, the command
+that runs it and a configuration that sets `max-lines` to 500,
+`complexity` to 20 and `max-lines-per-function` to 50 as errors and
+switches the last one off for test files, said what to do with code
+already past a limit, and installed nothing.
+Seen with the eval case `setup-linter-only-warns`, one run each, in the
+same project with ESLint and `complexity` set as a warning at 15: without
+the paragraph on an existing linter the report showed none of the three
+limits; with it, the report showed `complexity`, `max-lines` and
+`max-lines-per-function` set as errors, and the configuration file stayed
+as it was. While the paragraph only said "on the same terms" and "keep a
+value the configuration already sets", one run in seven did not show
+`complexity` at 15, and the reports weighed 15 against the tool's default
+of 20; with the exception spelled out, five runs of five kept 15.
+Both cases passed in one run on Haiku and in one on Opus.
+Seen once each on Sonnet, in control cases that are not part of the suite:
+with a linter that already sets every limit as an error the report proposed
+no lines and left the file as it was; in a Python project with no linter it
+recommended ruff with limits on complexity, statements and branches as
+errors, none of the last two for the tests, and said that ruff has no rule
+for the length of a file.
+Not checked: whether the values a report calls a tool's defaults are its
+defaults; a third language; a project whose code already breaks a limit.

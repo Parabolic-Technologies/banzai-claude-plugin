@@ -313,18 +313,26 @@ test('a gate that cannot keep its state does not pass silently', () => {
   assert.equal(out.decision, 'ask');
   assert.match(out.reason, /gate failed/);
 
-  // A shell call whose snapshot cannot be stored asks; an MCP call is denied.
+  // After /banzai:fix or /banzai:auto a call is not compared, so there is
+  // nothing to store.
   fs.writeFileSync(path.join(dataOf(root), 'sessions/s1'), 'not a directory');
+  assert.equal(shell(root, 'ls').decision, null);
+  entry(root, 'banzai:auto');
+  assert.equal(shell(root, 'ls').decision, null);
+  // A shell or MCP call whose snapshot cannot be stored asks; another tool is denied.
+  entry(root, 'banzai:feature');
   const asked = shell(root, 'ls');
   assert.equal(asked.decision, 'ask');
   assert.match(asked.reason, /could not record this tool call/);
-  assert.equal(pre(root, 'mcp__docs__search', {}).decision, 'deny');
+  assert.equal(pre(root, 'mcp__docs__search', {}).decision, 'ask');
+  assert.equal(pre(root, 'Monitor', {}).decision, 'deny');
   assert.equal(shell(root, 'ls', { tool_use_id: '' }).decision, 'ask');
 
   // A broken key stops everything that would run.
   fs.writeFileSync(path.join(dataOf(root), 'state-key'), '');
   assert.equal(shell(root, 'ls').decision, 'ask');
-  assert.equal(pre(root, 'mcp__docs__search', {}).decision, 'deny');
+  assert.equal(pre(root, 'mcp__docs__search', {}).decision, 'ask');
+  assert.equal(pre(root, 'Monitor', {}).decision, 'deny');
 });
 
 test('malformed or empty input is ignored', () => {

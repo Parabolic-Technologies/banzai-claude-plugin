@@ -1,0 +1,44 @@
+schema_version: "1.1"
+name: auto-large-file
+description: A typed /banzai:auto builds a feature and leaves a source file that is past the size limit no longer than it was.
+tags: [auto]
+runs: 1
+context:
+  scaffold_script: scaffold.sh
+execution:
+  prompt: "/banzai:auto add a --shout flag to the greet command line that prints the greeting in upper case"
+  max_turns: 150
+  timeout_seconds: 2400
+  allowed_tools: [Read, Glob, Grep, Skill, Agent, AskUserQuestion, TodoWrite]
+graders:
+  - name: plan-written
+    type: file_exists
+    path: 'documentation/work/*/plan.md'
+  - name: report-written
+    type: file_exists
+    path: 'documentation/work/*/report.md'
+  # The file starts at 519 lines, past the limit of 500, and has to end no
+  # longer. The untouched file passes too, so the next grader asks for the
+  # flag in source the run wrote.
+  - name: large-file-did-not-grow
+    type: regex
+    target: { source: file, path: src/greet.mjs }
+    pattern: '^(?:[^\n]*\n){0,518}[^\n]*\n?$'
+  # The trace is one message per line: a file tool wrote the flag into a
+  # file under src/, the large one or a new one.
+  - name: flag-written-to-source
+    type: regex
+    target: trace
+    pattern: '"type":\s*"tool_use"[^\n]*"name":\s*"(Write|Edit)"[^\n]*"file_path":\s*"[^"]*/src/[^"]*"[^\n]*shout'
+  # A flag written only into a new file that nothing loads is not built: the
+  # large file handles the flag itself or loads another module.
+  - name: large-file-reaches-the-flag
+    type: regex
+    target: { source: file, path: src/greet.mjs }
+    pattern: 'shout|from\s*[''"]\.\.?/|import\s*\('
+  - name: last-message
+    type: llm
+    criteria: >-
+      PASS if the final message says the --shout flag was built and that the
+      tests pass. FAIL if it says the work is blocked, waits for an approval,
+      or is unfinished.

@@ -10,7 +10,7 @@
     {
       "name": "banzai",
       "source": "./plugins/banzai",
-      "description": "Spec-driven development with human-in-the-loop plan approval or a human-on-the-loop run, guardrails for source edits, and an independent code review.",
+      "description": "Spec-driven development that keeps requirements, plans, reports and an independent code review in your repository, with human-in-the-loop plan approval or a human-on-the-loop run, and guardrails for source edits.",
       "category": "development",
       "tags": ["spec-driven-development", "human-in-the-loop", "human-on-the-loop", "workflow", "code-review", "guardrails"]
     }

@@ -19,10 +19,10 @@
 //   9. otherwise                                   -> ask, for this one change
 //
 // The shell and MCP tools can change files too, and the host does not say
-// which. The hook compares source content before and after each such call.
-// A change the rules above would not have passed is remembered, the developer
-// is told, and the next shell command asks the developer to accept it. A call
-// that could not be compared counts as a change.
+// which. Except in a session whose changes all pass, the hook compares source
+// content before and after each such call. A change the rules above would not
+// have passed is remembered, the developer is told, and the next shell command
+// or MCP call asks to accept it. A call it could not compare counts as one.
 //
 // An approval record is written only when the developer answers "Yes" to the
 // dialog the hook raises for the approval command: the hook asks before the
@@ -38,6 +38,8 @@ import {
 
 const ENTRY_COMMANDS = { 'banzai:fix': 'fix', 'banzai:feature': 'feature', 'banzai:auto': 'auto' };
 const FILE_TOOLS = new Set(['Write', 'Edit', 'MultiEdit', 'NotebookEdit']);
+// The dialogs of the shell and of an MCP tool show the hook's text in full.
+const showsText = (tool) => tool === 'Bash' || String(tool).startsWith('mcp__');
 const APPROVAL_NAME = 'banzai-request-approval';
 const APPROVAL_COMMAND = new RegExp(`^(?::[ \\t]*)?${APPROVAL_NAME}[ \\t]+(\\S+)$`);
 const APPROVAL_IN_COMPOUND = new RegExp(`(^|[;&|(\\n]\\s*)(:\\s*)?${APPROVAL_NAME}(\\s|$)`);
@@ -98,11 +100,15 @@ function summaryOf(root, work) {
   return fits ? summary : null;
 }
 
+// A session whose source changes pass whatever the project holds: after
+// /banzai:auto, and after /banzai:fix while no work is attached.
+const isOpen = (session) => session.entry === 'auto' || (!session.work && session.entry === 'fix');
+
 // Whether a source change passes now. With `reason`, why it does not.
 function standing(root, session) {
-  if (session.entry === 'auto') return { ok: true };
+  if (isOpen(session)) return { ok: true };
   const work = session.work;
-  if (!work) return { ok: session.entry === 'fix' };
+  if (!work) return { ok: false };
   const run = `run exactly this shell command, alone: ${approvalCommand(work)}`;
   const current = isWork(root, work) ? bundle(root, work) : null;
   if (!current) return { ok: false, reason: `Work "${work}" has no plan at documentation/work/${work}/plan.md. Write or restore it, then ${run}` };
@@ -125,7 +131,7 @@ function onSessionStart(payload, root, session) {
     'This project uses the banzai plugin: source changes need the developer\'s go-ahead.',
     '- The developer starts work by typing /banzai:fix <request> for a small direct change, /banzai:feature <request or work name> for planned work, or /banzai:auto <request or work name> for planned work that runs with no approval dialog. Only a command the developer typed counts; one you start through the Skill tool does not. Without one, each source change asks the developer.',
     `- Planned work has a plan at documentation/work/<work>/plan.md. After writing or changing it, show the developer the approval dialog by running exactly this shell command, alone: ${approvalCommand('<work>')} Work the developer started with /banzai:auto needs no approval: do not run it there.`,
-    '- Source changes made through the shell or other tools are compared before and after, and unapproved ones are shown to the developer in the dialog of the next shell command.',
+    '- Source changes made through the shell or other tools are compared before and after, and unapproved ones are shown to the developer in the dialog of the next shell command or MCP tool call.',
     '- The developer can also type /banzai:review <work> for an independent review and /banzai:epic for large work split into packages. Always name a command in full; a bare /review is a different command.',
     `Newest work: ${works.length ? works.join('; ') : 'none yet'}.`,
     `This session: ${here}.`
@@ -206,18 +212,23 @@ function onToolCall(payload, root, session) {
   } else if (session.unapproved.length) {
     if (standing(root, session).ok) {
       updateSession(payload.session_id, (current) => { current.unapproved = []; });
-    } else if (isShell) {
-      // Only the shell's dialog is known to show this text to the developer.
+    } else if (showsText(payload.tool_name)) {
       request.accept = session.unapproved;
       output = decision('ask', [
         'Tool calls in this session changed source files without the developer\'s approval:',
         ...listed(session.unapproved),
-        'They are not accepted until the developer allows this command. Allowing it accepts them and runs it.'
+        'They are not accepted until the developer allows this tool call. Allowing it accepts them and runs it.'
       ].join('\n'));
     } else {
+      // Another tool's dialog is not known to show the hook's text.
       return decision('deny', `Tool calls in this session changed source files without the developer's approval: ${session.unapproved.slice(0, 5).join(', ')}${session.unapproved.length > 5 ? ' and more' : ''}. The developer accepts them in the dialog of a shell command. Run one, for example: git status`);
     }
   }
+
+  // Nothing such a session changes is held back, so the call is not compared.
+  // If the session stops being open while the call runs, the call has no
+  // entry afterwards and counts as a change.
+  if (!match && isOpen(session)) return null;
 
   const id = payload.tool_use_id;
   let failure = typeof id === 'string' && id ? null : 'the host sent no tool call id';
@@ -227,7 +238,8 @@ function onToolCall(payload, root, session) {
     failure = error.message;
   }
   // A call the gate cannot follow must not run unseen.
-  if (failure) return decision(isShell && !match ? 'ask' : 'deny', `The banzai gate could not record this tool call (${failure}), so its changes would not be compared.${isShell && !match ? ' Allowing it runs the command anyway.' : ''}`);
+  const canAsk = showsText(payload.tool_name) && !match;
+  if (failure) return decision(canAsk ? 'ask' : 'deny', `The banzai gate could not record this tool call (${failure}), so its changes would not be compared.${canAsk ? ' Allowing it runs the call anyway.' : ''}`);
   return output;
 }
 
@@ -266,15 +278,16 @@ function onAfterTool(payload, root) {
     updateSession(sessionId, (session) => { session.unapproved = session.unapproved.filter((name) => !pending.accept.includes(name)); });
   }
 
-  // A call with no entry was not followed: its state was lost or removed.
+  // A call with no entry was not compared: the session was open when it
+  // started, or its state was lost or removed.
   const changed = pending ? changedSource(root, pending.before).map(printable) : [NOT_COMPARED];
   if (!changed.length || standing(root, readSession(sessionId)).ok) return notes.length ? context(event, notes.join('\n')) : null;
   updateSession(sessionId, (session) => {
     session.unapproved = [...new Set([...session.unapproved, ...changed])].sort().slice(0, MAX_UNAPPROVED);
   });
   const what = `${changed.slice(0, 10).join(', ')}${changed.length > 10 ? ` and ${changed.length - 10} more` : ''}`;
-  notes.push(`This tool call changed source files without the developer's approval: ${what}. The next shell command will ask the developer to accept them.`);
-  return { ...context(event, notes.join('\n')), systemMessage: `banzai: source changed without approval (${what}). The next shell command will ask you to accept it.` };
+  notes.push(`This tool call changed source files without the developer's approval: ${what}. The next shell command or MCP tool call will ask the developer to accept them.`);
+  return { ...context(event, notes.join('\n')), systemMessage: `banzai: source changed without approval (${what}). The next shell command or MCP tool call will ask you to accept it.` };
 }
 
 function handle(payload) {
@@ -318,7 +331,7 @@ if (payload && typeof payload === 'object') {
   } catch (error) {
     // A broken gate must not open silently: before a tool runs, stop or ask.
     if (payload.hook_event_name === 'PreToolUse') {
-      const canAsk = payload.tool_name === 'Bash' || FILE_TOOLS.has(payload.tool_name);
+      const canAsk = showsText(payload.tool_name) || FILE_TOOLS.has(payload.tool_name);
       emit(decision(canAsk ? 'ask' : 'deny', `The banzai gate failed (${error && error.message}).${canAsk ? ' Allowing it permits this one tool call.' : ''}`));
     }
   }
