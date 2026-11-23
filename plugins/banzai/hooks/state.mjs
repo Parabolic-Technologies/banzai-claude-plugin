@@ -407,6 +407,19 @@ function differs(before, after) {
   return isOid(content) && !(known.includes(index2) && known.includes(commit2));
 }
 
+// The source files a commit, a checkout or a pull changed, among those that
+// were clean before and are clean now. Null when Git cannot tell.
+function movedWithHead(root, before, after) {
+  if (!isOid(after.head)) return null;
+  try {
+    const args = isOid(before.head) ? ['diff', '--name-only', '-z', '--no-renames', before.head, after.head] : ['ls-tree', '-r', '--name-only', '-z', after.head];
+    const names = git(after.top, args).split('\0');
+    return names.map((name) => sourceRel(root, after.top, name)).filter((rel) => rel && !(rel in before.files));
+  } catch {
+    return null;
+  }
+}
+
 // The source files that differ from a snapshot taken before a tool call.
 export function changedSource(root, before) {
   const after = snapshot(root, before && !before.failed ? before : null);
@@ -419,19 +432,12 @@ export function changedSource(root, before) {
     const now = stamp(path.join(root, rel), before.algo, before.cheap && value.endsWith('||'));
     if (now !== value.split('|').slice(0, 2).join('|')) changed.add(rel);
   }
-  // A file that was clean before and is clean now changed if a commit, a
-  // checkout or a pull moved the branch in between.
+  // A file that was clean before and is clean now changed if the branch
+  // moved in between.
   if (before.head !== after.head) {
-    if (!isOid(after.head)) return [NOT_COMPARED];
-    try {
-      const args = isOid(before.head) ? ['diff', '--name-only', '-z', '--no-renames', before.head, after.head] : ['ls-tree', '-r', '--name-only', '-z', after.head];
-      for (const name of git(after.top, args).split('\0')) {
-        const rel = sourceRel(root, after.top, name);
-        if (rel && !(rel in before.files)) changed.add(rel);
-      }
-    } catch {
-      return [NOT_COMPARED];
-    }
+    const moved = movedWithHead(root, before, after);
+    if (!moved) return [NOT_COMPARED];
+    for (const rel of moved) changed.add(rel);
   }
   return [...changed].sort();
 }

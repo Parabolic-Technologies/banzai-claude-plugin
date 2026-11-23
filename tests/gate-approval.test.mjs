@@ -5,8 +5,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { test } from 'node:test';
 import {
-  GATE, COMMAND, SUMMARY, dataOf, envOf, repo, put, run, hook, pre, write, shell, post, entry,
-  recordExists, approve, plannedRepo, call
+  GATE, COMMAND, SUMMARY, dataOf, envOf, repo, put, hook, pre, write, shell, post, entry,
+  recordExists, approve, plannedRepo
 } from './helpers.mjs';
 
 test('the approval command asks and names the files it will hash', () => {

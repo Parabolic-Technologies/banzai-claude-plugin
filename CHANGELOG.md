@@ -4,6 +4,21 @@ All notable changes to the Banzai plugin are listed here. Versions follow
 [Semantic Versioning](https://semver.org/). A change to a command name, to
 the hook's decisions or to the document layout is a breaking change.
 
+## 1.2.1 - 2026-11-23
+
+### Changed
+
+- The README starts with a quick start and explains how the plugin works:
+  its skills, the reviewer agent, the hook's events, the approval click and
+  how a change through the shell or an MCP tool is found.
+
+### Fixed
+
+- When a work was already approved and a source change still waited for
+  your acceptance, the approval command told the model that a dialog would
+  ask you about the change, and none came. It now answers that the work is
+  already approved.
+
 ## 1.2.0 - 2026-11-22
 
 ### Added

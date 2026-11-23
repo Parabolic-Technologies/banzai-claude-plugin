@@ -5,6 +5,11 @@
   "type": "module",
   "scripts": {
     "test": "node --test \"tests/*.test.mjs\"",
+    "lint": "eslint .",
     "eval": "claude plugin eval plugins/banzai --scaffold --no-publish --ablation none --model sonnet --allow-tools Bash Write Edit"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.15.0"
   }
 }

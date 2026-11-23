@@ -90,6 +90,23 @@ test('a comparison Git cannot make counts as a change', () => {
   assert.match(out.note, /could not be compared/);
 });
 
+test('a branch Git cannot compare after the call counts as a change', () => {
+  // The branch has no commit after the call, and its files are gone.
+  const emptied = gitRepo();
+  const orphan = call(emptied, () => { git(emptied, 'checkout', '-q', '--orphan', 'empty'); git(emptied, 'rm', '-rfq', '.'); });
+  assert.match(orphan.note, /could not be compared/);
+
+  // The commit from before the call is gone, so Git cannot list what moved.
+  const amended = gitRepo();
+  const rewritten = call(amended, () => {
+    put(amended, 'src/base.js', 'other\n');
+    git(amended, 'commit', '-q', '-a', '--amend', '-m', 'base');
+    git(amended, 'reflog', 'expire', '--expire=now', '--all');
+    git(amended, 'gc', '-q', '--prune=now');
+  });
+  assert.match(rewritten.note, /could not be compared/);
+});
+
 test('a first commit and a nested repository are compared', () => {
   const root = repo();
   put(root, 'documentation/work/demo/plan.md', '# Plan\n' + SUMMARY);

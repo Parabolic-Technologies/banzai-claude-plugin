@@ -625,3 +625,35 @@ errors, none of the last two for the tests, and said that ruff has no rule
 for the length of a file.
 Not checked: whether the values a report calls a tool's defaults are its
 defaults; a third language; a project whose code already breaks a limit.
+
+## 2026-11-22: The repository lints itself with the limits `setup` recommends
+
+ESLint is the repository's one development dependency, with `@eslint/js`
+for its recommended rules. `npm run lint` fails on a source or test file
+past 500 lines, on a function with a complexity over 20 and on a function
+longer than 50 lines; a test file has no limit on the length of a function.
+CI runs it in a job of its own. The hook and the plugin's directory still
+have no dependency, and the tests still run without an install.
+Reason: the plugin tells a project that a limit holds only where a check
+fails on it, and this repository had no such check.
+Measured on the day the linter was added: no file past 500 lines; three
+functions of the hook past the limit on complexity, at 29, 23 and 22, and
+one of them past the limit on length, at 71 lines; two unused imports in a
+test and one unused initial value in the hook, both removed.
+The three functions were split in the same work, so the configuration
+records no exception. The hook's decisions did not change: the tests' 419
+hook events got the same answers, word for word, from the hook before the
+split and after it. The split took the hook from 797 to 815 lines.
+Rejected: recording the three functions as exceptions, by a comment that
+switches a rule off for one function, which lets that function grow
+without a word, or by a higher limit for its file, which lets its
+neighbours grow to it; the `globals` package, for three names; limits as
+warnings.
+Breaking the new functions on purpose, one place at a time, the tests
+noticed eleven breaks of sixteen; the five they missed were in conditions
+the split did not change. Two tests added afterwards notice three of them.
+The other two were faults of the hook and left it: a line that no call
+reached, and a condition under which the approval command promised a
+dialog that never came. That was for a work approved again while a change
+still waited; the command now answers that the work is already approved.
+Not checked: the lint job on GitHub.

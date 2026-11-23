@@ -25,11 +25,20 @@ directly.
 
 ## Development
 
-The repository has no dependencies and no build step. Use Node.js 22 or
-later; CI runs the tests on Node.js 22, 24 and 26.
+The plugin has no dependencies and no build step, and the tests need no
+install. The repository's one development dependency is the linter. Use
+Node.js 22 or later; CI runs the tests on Node.js 22, 24 and 26.
 
 ```bash
 npm test
+```
+
+```bash
+npm ci
+```
+
+```bash
+npm run lint
 ```
 
 ```bash
@@ -44,10 +53,14 @@ claude plugin validate plugins/banzai
 PLUGIN="$PWD/plugins/banzai"; cd "$(mktemp -d)" && git init && claude --plugin-dir "$PLUGIN"
 ```
 
-The first command runs every test. The next two check the marketplace
-manifest, the plugin's manifest and the skills. The last one starts Claude
-Code with your working copy of the plugin in a new, empty Git project; type
-`/banzai:setup` there to switch the hook on.
+The first command runs every test. The next two install ESLint and run it:
+it fails on a source or test file past 500 lines, on a function with a
+complexity over 20 and on a function longer than 50 lines, the limits
+`/banzai:setup` recommends to a project. The two `claude plugin validate`
+commands check the marketplace manifest, the plugin's manifest and the
+skills. The last one starts Claude Code with your working copy of the
+plugin in a new, empty Git project; type `/banzai:setup` there to switch
+the hook on.
 
 The behaviour of the commands has its own check, which CI does not run:
 

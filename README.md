@@ -1,9 +1,10 @@
+![Banzai, a Claude Code plugin for spec-driven development. Left, /banzai:feature: the approval dialog quotes the plan and offers Yes and No. Right, /banzai:auto: the last message lists what was built, what you decided, what was decided for you, the review, the checks and the change.](assets/social-preview.png)
+
 # Banzai
 
-**Spec-driven development for Claude Code with a human in the loop or on the
-loop: the AI agent works from a written plan, an independent reviewer checks
-what it built, and the requirements, the plan, the report and the review
-stay in your repository as Markdown.**
+**Spec-driven development for Claude Code: an independent reviewer checks
+what the AI agent built, and the requirements, the plan, the report and the
+review stay in your repository as Markdown.**
 
 [![CI](https://github.com/Parabolic-Technologies/banzai-claude-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/Parabolic-Technologies/banzai-claude-plugin/actions/workflows/ci.yml)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue)](LICENSE)
@@ -14,6 +15,26 @@ conversation. Banzai is a Claude Code plugin for developers who want the
 agent to work from a spec and a plan, want its change checked by a reviewer
 that did not write it, and want to choose, task by task, how closely they
 supervise it.
+
+## Quick start
+
+In your project's directory:
+
+```bash
+claude plugin marketplace add Parabolic-Technologies/banzai-claude-plugin
+claude plugin install banzai@parabolic-plugins --scope project
+```
+
+Then start Claude Code there, type `/banzai:setup` once, and give it a first
+piece of work:
+
+```text
+/banzai:feature let the greet CLI print the greeting in upper case
+```
+
+This needs Claude Code 2.1.327 or later, Node.js 22 or later and a project
+in Git. [Install](#install) covers an install for all your projects, what
+`setup` writes and the steps for a team.
 
 ## What a piece of work leaves behind
 
@@ -89,6 +110,71 @@ session.
 Compared with letting the agent run on its own: `/banzai:auto` asks before
 it guesses what users get, has a reviewer with fresh context check the plan
 and the finished change, and tells you which choices it made for you.
+
+## How it works
+
+Banzai runs no agent loop of its own. It is built from Claude Code's
+extension points: skills, a subagent and one hook.
+
+- **Skills.** Each of the six commands is a skill that only a typed command
+  starts. A seventh skill, `audit`, is not a command: `/banzai:auto` runs
+  it in a forked context for its two audits.
+- **A reviewer agent.** The audits run as the plugin's `reviewer` agent,
+  whose tools are `Read`, `Grep`, `Glob` and `Bash`. It has no file-writing
+  tool, and it sees none of the conversation that produced the work.
+- **The gate.** One hook: about 800 lines of plain JavaScript in
+  [`plugins/banzai/hooks/`](plugins/banzai/hooks), with no dependencies.
+  Claude Code starts it as one process per hook event. It reads the event
+  as JSON and answers with at most one JSON object.
+
+| Hook event                          | What the gate does                                                                                                                                             |
+| ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `SessionStart`                      | Gives the model the project's rules and names the newest works.                                                                                                |
+| `UserPromptExpansion`               | Notes the entry command you typed. A skill the model starts raises no such event, so a command counts only when you typed it.                                  |
+| `PreToolUse`                        | Before a file tool, a shell command or an MCP call: no decision, `ask` or `deny`. It never answers `allow`, so Claude Code's own permission rules still apply. |
+| `PostToolUse`, `PostToolUseFailure` | Learns that a call it asked about ran, which means you answered "Yes", and compares the project's source files with what they held before the call.            |
+
+**The approval click.** When a plan is ready, the model runs a shell command
+that does nothing, `: banzai-request-approval <work>`. The gate answers it
+with `ask`; its text quotes the plan's "For approval" lines and lists the
+files your answer approves. The approval is recorded only when Claude Code
+reports that this same call ran, which happens only after your "Yes". The
+question rides on a shell command because that dialog shows a hook's text,
+and the dialog of a file write hides it.
+([Decision](DECISIONS.md#2026-11-17-the-approval-click-is-the-hooks-answer-to-a-no-op-shell-command))
+
+**An approval means "these bytes".** The record holds the SHA-256 of
+`plan.md`, of `requirements.md` when there is one, and of each decision
+record the plan links to. It is valid while the same files with the same
+hashes are on disk: unchanged files need no second click in a new session,
+and a change to any of them ends the approval. Each record is sealed with an
+HMAC under a key in the plugin's data directory, and a record without a
+valid seal counts as absent.
+([Decision](DECISIONS.md#2026-11-17-an-approval-is-bound-to-file-contents-and-kept-in-the-project))
+
+**What the gate cannot stop, it finds.** Claude Code does not say which
+files a shell command or an MCP call changed. In a session where a source
+change can be held back, the gate takes Git's list of changed and untracked
+source files before and after each such call and compares what they hold. A
+change it would not have passed is remembered, and the next shell command
+or MCP call asks you about it.
+([Decision](DECISIONS.md#2026-11-17-shell-and-mcp-changes-are-detected-then-asked-about))
+
+When the gate itself fails before a tool call, it asks or refuses and does
+not let the call pass unseen. When the hook does not run at all, nothing is
+held back; see [What the hook holds back](#what-the-hook-holds-back).
+
+It is checked in three ways:
+
+- **Tests** drive the gate the way Claude Code does: one process per event,
+  with the event on stdin. `npm test` needs no install, and CI runs it on
+  Node.js 22, 24 and 26.
+- **Evals** in [`plugins/banzai/evals/`](plugins/banzai/evals) run the
+  commands in real Claude Code sessions through `claude plugin eval` and
+  grade each run by the files and the tool calls it leaves. They need a
+  signed-in Claude Code and are not part of CI.
+- **[DECISIONS.md](DECISIONS.md)** gives each design choice with its
+  reason, what was rejected and what was not checked.
 
 ## Requirements
 

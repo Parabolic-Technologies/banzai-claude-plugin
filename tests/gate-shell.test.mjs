@@ -147,6 +147,21 @@ test('earlier unapproved changes are accepted in their own dialog, before the ap
   assert.equal(write(root, 'src/a.js').decision, null);
 });
 
+test('a change that waits is dropped once it would pass anyway', () => {
+  const root = gitRepo('demo');
+  const plan = 'documentation/work/demo/plan.md';
+  entry(root, 'banzai:feature', 'demo');
+  approve(root, 'demo');
+  put(root, plan, '# Plan\n' + SUMMARY + '\nMore.\n');
+  assert.match(call(root, () => put(root, 'src/x.js', 'x\n')).note, /src\/x\.js/);
+  // The plan is again what the developer approved.
+  put(root, plan, '# Plan\n' + SUMMARY);
+  assert.match(shell(root, `${COMMAND} demo`).reason, /already approved/, 'no dialog is promised for it');
+  assert.equal(call(root, nothing).before.decision, null, 'it passes by now, so nothing is asked');
+  put(root, plan, '# Plan\n' + SUMMARY + '\nMore.\n');
+  assert.equal(shell(root, 'ls').decision, null, 'and it does not come back when the approval ends again');
+});
+
 test('a typed entry command starts over', () => {
   const root = gitRepo('demo');
   entry(root, 'banzai:feature', 'demo');

@@ -5,3 +5,4 @@ notes/
 
 .DS_Store
 plugins/banzai/evals/results/
+node_modules/

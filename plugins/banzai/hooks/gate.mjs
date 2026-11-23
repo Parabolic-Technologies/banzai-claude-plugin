@@ -83,7 +83,7 @@ function targetOf(payload) {
 // The lines of the plan's "For approval" section, which the approval dialog
 // shows to the developer, or null when they are missing or would not fit.
 function summaryOf(root, work) {
-  let lines = [];
+  let lines;
   try {
     lines = fs.readFileSync(path.join(root, WORK_DIR, work, 'plan.md'), 'utf8').split(/\r?\n/);
   } catch {
@@ -170,98 +170,98 @@ function onFileWrite(payload, root, session) {
   return decision('ask', `This session has no typed /banzai:fix, /banzai:feature or /banzai:auto command. Allowing it permits this one change to ${rel}.`);
 }
 
-// Before a shell or MCP call. `request` is what the developer's answer will mean.
+// What the approval command gets: a refusal, or the question and what the
+// developer's answer to it will mean.
+function approvalStep(root, session, work) {
+  const refuse = (text) => ({ refusal: decision('deny', text) });
+  if (!isWork(root, work)) return refuse(`"${work}" is not a work directory under documentation/work/. Its name may hold letters, digits, ".", "_" and "-", and it must be a real directory, not a link. Use the directory's name: ${approvalCommand('<work>')}`);
+  const files = bundle(root, work);
+  if (!files) return refuse(`Work "${work}" has no plan. Write documentation/work/${work}/plan.md first, then run: ${approvalCommand(work)}`);
+  if (session.entry !== 'auto' && session.work === work && standing(root, session).ok) {
+    return refuse(`Work "${work}" is already approved and its files have not changed. Source writes are allowed; there is no need to run this command.`);
+  }
+  // Their list would push the plan's lines out of the dialog's visible rows.
+  if (session.unapproved.length) return refuse(`Source files were changed before this approval: ${session.unapproved.slice(0, 5).join(', ')}${session.unapproved.length > 5 ? ' and more' : ''}. The developer accepts them first, in the dialog of a shell command. Run one, for example: git status. Then run: ${approvalCommand(work)}`);
+  const summary = summaryOf(root, work);
+  if (!summary) return refuse(`The plan of work "${work}" needs exactly one "## For approval" section: one to ${MAX_SUMMARY_LINES} lines, each of at most ${MAX_SUMMARY_WIDTH} characters, that say what will be built and name each choice the developer did not make. The approval dialog shows exactly these lines to the developer. Add or shorten the section, then run: ${approvalCommand(work)}`);
+  // The plan's lines come first: the desktop app shows about three rows.
+  const output = decision('ask', [
+    ...summary,
+    `Approval requested for work "${work}".`,
+    'Allowing this command approves these files until one of them changes:',
+    ...bulleted(files.map((file) => file.path)),
+    'Not approved until the developer allows it here.'
+  ].join('\n'));
+  return { request: { approval: { work, files } }, output };
+}
+
+// A call while changes wait for the developer: they pass by now, or the
+// call asks about them, or it is refused.
+function unapprovedStep(payload, root, session) {
+  if (standing(root, session).ok) {
+    updateSession(payload.session_id, (current) => { current.unapproved = []; });
+    return {};
+  }
+  // Another tool's dialog is not known to show the hook's text.
+  if (!showsText(payload.tool_name)) return { refusal: decision('deny', `Tool calls in this session changed source files without the developer's approval: ${session.unapproved.slice(0, 5).join(', ')}${session.unapproved.length > 5 ? ' and more' : ''}. The developer accepts them in the dialog of a shell command. Run one, for example: git status`) };
+  const output = decision('ask', [
+    'Tool calls in this session changed source files without the developer\'s approval:',
+    ...listed(session.unapproved),
+    'They are not accepted until the developer allows this tool call. Allowing it accepts them and runs it.'
+  ].join('\n'));
+  return { request: { accept: session.unapproved }, output };
+}
+
+// Remembers the call so that its changes can be compared after it. Returns
+// why it could not, or null.
+function recordCall(payload, root, request) {
+  const id = payload.tool_use_id;
+  if (typeof id !== 'string' || !id) return 'the host sent no tool call id';
+  try {
+    putPending(payload.session_id, id, { ...request, before: snapshot(root), at: Date.now() });
+    return null;
+  } catch (error) {
+    return error.message;
+  }
+}
+
+// Before a shell or MCP call. A step's `request` is what the developer's
+// answer will mean.
 function onToolCall(payload, root, session) {
   const isShell = payload.tool_name === 'Bash';
   const command = isShell ? String((payload.tool_input || {}).command || '').trim() : '';
   const match = APPROVAL_COMMAND.exec(command);
-  const request = {};
-  let output = null;
-
-  if (match) {
-    const work = match[1];
-    if (!isWork(root, work)) {
-      return decision('deny', `"${work}" is not a work directory under documentation/work/. Its name may hold letters, digits, ".", "_" and "-", and it must be a real directory, not a link. Use the directory's name: ${approvalCommand('<work>')}`);
-    }
-    const files = bundle(root, work);
-    if (!files) {
-      return decision('deny', `Work "${work}" has no plan. Write documentation/work/${work}/plan.md first, then run: ${approvalCommand(work)}`);
-    }
-    if (session.entry !== 'auto' && session.work === work && standing(root, session).ok && !session.unapproved.length) {
-      return decision('deny', `Work "${work}" is already approved and its files have not changed. Source writes are allowed; there is no need to run this command.`);
-    }
-    // Their list would push the plan's lines out of the dialog's visible rows.
-    if (session.unapproved.length) {
-      return decision('deny', `Source files were changed before this approval: ${session.unapproved.slice(0, 5).join(', ')}${session.unapproved.length > 5 ? ' and more' : ''}. The developer accepts them first, in the dialog of a shell command. Run one, for example: git status. Then run: ${approvalCommand(work)}`);
-    }
-    const summary = summaryOf(root, work);
-    if (!summary) {
-      return decision('deny', `The plan of work "${work}" needs exactly one "## For approval" section: one to ${MAX_SUMMARY_LINES} lines, each of at most ${MAX_SUMMARY_WIDTH} characters, that say what will be built and name each choice the developer did not make. The approval dialog shows exactly these lines to the developer. Add or shorten the section, then run: ${approvalCommand(work)}`);
-    }
-    request.approval = { work, files };
-    // The plan's lines come first: the desktop app shows about three rows.
-    output = decision('ask', [
-      ...summary,
-      `Approval requested for work "${work}".`,
-      'Allowing this command approves these files until one of them changes:',
-      ...bulleted(files.map((file) => file.path)),
-      'Not approved until the developer allows it here.'
-    ].join('\n'));
-  } else if (APPROVAL_IN_COMPOUND.test(command)) {
-    return decision('deny', `Run the approval command alone, on one line, with nothing before or after it: ${approvalCommand('<work>')}`);
-  } else if (session.unapproved.length) {
-    if (standing(root, session).ok) {
-      updateSession(payload.session_id, (current) => { current.unapproved = []; });
-    } else if (showsText(payload.tool_name)) {
-      request.accept = session.unapproved;
-      output = decision('ask', [
-        'Tool calls in this session changed source files without the developer\'s approval:',
-        ...listed(session.unapproved),
-        'They are not accepted until the developer allows this tool call. Allowing it accepts them and runs it.'
-      ].join('\n'));
-    } else {
-      // Another tool's dialog is not known to show the hook's text.
-      return decision('deny', `Tool calls in this session changed source files without the developer's approval: ${session.unapproved.slice(0, 5).join(', ')}${session.unapproved.length > 5 ? ' and more' : ''}. The developer accepts them in the dialog of a shell command. Run one, for example: git status`);
-    }
-  }
+  let step = {};
+  if (match) step = approvalStep(root, session, match[1]);
+  else if (APPROVAL_IN_COMPOUND.test(command)) step = { refusal: decision('deny', `Run the approval command alone, on one line, with nothing before or after it: ${approvalCommand('<work>')}`) };
+  else if (session.unapproved.length) step = unapprovedStep(payload, root, session);
+  if (step.refusal) return step.refusal;
 
   // Nothing such a session changes is held back, so the call is not compared.
   // If the session stops being open while the call runs, the call has no
   // entry afterwards and counts as a change.
   if (!match && isOpen(session)) return null;
 
-  const id = payload.tool_use_id;
-  let failure = typeof id === 'string' && id ? null : 'the host sent no tool call id';
-  try {
-    if (!failure) putPending(payload.session_id, id, { ...request, before: snapshot(root), at: Date.now() });
-  } catch (error) {
-    failure = error.message;
-  }
+  const failure = recordCall(payload, root, step.request);
   // A call the gate cannot follow must not run unseen.
   const canAsk = showsText(payload.tool_name) && !match;
   if (failure) return decision(canAsk ? 'ask' : 'deny', `The banzai gate could not record this tool call (${failure}), so its changes would not be compared.${canAsk ? ' Allowing it runs the call anyway.' : ''}`);
-  return output;
+  return step.output ?? null;
 }
 
-// The host reports a tool call here only after it ran, so a question the hook
-// asked for the same tool use id was answered "Yes".
-function onAfterTool(payload, root) {
-  const event = payload.hook_event_name;
-  const sessionId = payload.session_id;
-  const id = payload.tool_use_id;
+// Writing a plan with a file tool attaches the session to that work.
+function attachPlan(payload, root) {
+  const target = payload.hook_event_name === 'PostToolUse' ? targetOf(payload) : null;
+  const owner = target && planOwner(relativeTo(root, target) || '');
+  if (owner && isWork(root, owner)) updateSession(payload.session_id, (session) => { session.work = owner; });
+  return null;
+}
 
-  if (FILE_TOOLS.has(payload.tool_name)) {
-    // Writing a plan with a file tool attaches the session to that work.
-    const target = event === 'PostToolUse' ? targetOf(payload) : null;
-    const owner = target && planOwner(relativeTo(root, target) || '');
-    if (owner && isWork(root, owner)) updateSession(sessionId, (session) => { session.work = owner; });
-    return null;
-  }
-
+// What the developer's "Yes" to this call's question did: it approved a
+// work or accepted changes. Returns the notes for the model.
+function settleAnswer(pending, root, sessionId) {
   const notes = [];
-  const pending = typeof id === 'string' && id ? takePending(sessionId, id) : null;
-  const answered = pending && payload.is_interrupt !== true;
-  if (answered && pending.approval) {
+  if (pending.approval) {
     const { work } = pending.approval;
     const files = isWork(root, work) ? bundle(root, work) : null;
     if (files && sameFiles(files, pending.approval.files)) {
@@ -270,13 +270,24 @@ function onAfterTool(payload, root) {
       notes.push(`The developer answered "Yes". Work "${work}" is approved. Source writes are allowed until one of the approved files changes.`);
     } else {
       notes.push(`Work "${work}" is not approved: its files changed while the dialog was open. Run the command again: ${approvalCommand(work)}`);
-      pending.accept = null;
     }
   }
-  if (answered && Array.isArray(pending.accept) && pending.accept.length) {
+  if (Array.isArray(pending.accept) && pending.accept.length) {
     // "Yes" accepts what the dialog showed, not what was added since.
     updateSession(sessionId, (session) => { session.unapproved = session.unapproved.filter((name) => !pending.accept.includes(name)); });
   }
+  return notes;
+}
+
+// The host reports a tool call here only after it ran, so a question the hook
+// asked for the same tool use id was answered "Yes".
+function onAfterTool(payload, root) {
+  if (FILE_TOOLS.has(payload.tool_name)) return attachPlan(payload, root);
+  const event = payload.hook_event_name;
+  const sessionId = payload.session_id;
+  const id = payload.tool_use_id;
+  const pending = typeof id === 'string' && id ? takePending(sessionId, id) : null;
+  const notes = pending && payload.is_interrupt !== true ? settleAnswer(pending, root, sessionId) : [];
 
   // A call with no entry was not compared: the session was open when it
   // started, or its state was lost or removed.
