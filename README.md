@@ -127,12 +127,19 @@ extension points: skills, a subagent and one hook.
   Claude Code starts it as one process per hook event. It reads the event
   as JSON and answers with at most one JSON object.
 
-| Hook event                          | What the gate does                                                                                                                                             |
-| ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `SessionStart`                      | Gives the model the project's rules and names the newest works.                                                                                                |
-| `UserPromptExpansion`               | Notes the entry command you typed. A skill the model starts raises no such event, so a command counts only when you typed it.                                  |
-| `PreToolUse`                        | Before a file tool, a shell command or an MCP call: no decision, `ask` or `deny`. It never answers `allow`, so Claude Code's own permission rules still apply. |
-| `PostToolUse`, `PostToolUseFailure` | Learns that a call it asked about ran, which means you answered "Yes", and compares the project's source files with what they held before the call.            |
+What the gate does on each hook event:
+
+- `SessionStart`: gives the model the project's rules and names the newest
+  works.
+- `UserPromptExpansion`: notes the entry command you typed. A skill the
+  model starts raises no such event, so a command counts only when you
+  typed it.
+- `PreToolUse`: before a file tool, a shell command or an MCP call it gives
+  no decision, or answers `ask` or `deny`. It never answers `allow`, so
+  Claude Code's own permission rules still apply.
+- `PostToolUse`, `PostToolUseFailure`: learns that a call it asked about
+  ran, which means you answered "Yes", and compares the project's source
+  files with what they held before the call.
 
 **The approval click.** When a plan is ready, the model runs a shell command
 that does nothing, `: banzai-request-approval <work>`. The gate answers it
