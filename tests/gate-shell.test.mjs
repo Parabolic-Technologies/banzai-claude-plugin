@@ -162,10 +162,12 @@ test('a change that waits is dropped once it would pass anyway', () => {
   assert.equal(shell(root, 'ls').decision, null, 'and it does not come back when the approval ends again');
 });
 
-test('a typed entry command starts over', () => {
+test('a change that waits outlives a typed /banzai:feature and passes after /banzai:fix', () => {
   const root = gitRepo('demo');
   entry(root, 'banzai:feature', 'demo');
   call(root, () => put(root, 'src/early.js', 'x\n'));
+  entry(root, 'banzai:feature', 'another request');
+  assert.match(shell(root, 'ls').reason, /src\/early\.js/, 'the developer has not accepted it');
   entry(root, 'banzai:fix', 'keep going');
   assert.equal(shell(root, 'ls').decision, null);
 });
@@ -201,6 +203,12 @@ test('the hook is registered for the tools that can change files, and no others'
     for (const tool of ['TodoWrite', 'Read', 'BashOutput', 'Agent', 'mcp__ccd_turn__update_plan', 'mcp__ccd_turn__wrap_up']) assert.equal(matcher.test(tool), false, tool);
   }
   assert.ok(config.SessionStart && config.UserPromptExpansion);
+  // Every command starts a file the plugin ships.
+  const plugin = fileURLToPath(new URL('../plugins/banzai', import.meta.url));
+  for (const { command } of Object.values(config).flat().flatMap((group) => group.hooks)) {
+    const file = /^node "\$\{CLAUDE_PLUGIN_ROOT\}\/([^"]+)"$/.exec(command);
+    assert.ok(file && fs.statSync(path.join(plugin, file[1]), { throwIfNoEntry: false })?.isFile(), command);
+  }
 });
 
 test('a work typed as a path or with punctuation is the same work', () => {
@@ -243,6 +251,10 @@ test('every skill is typed by the developer only, and the skill text stays withi
   const top = (rel) => fs.readFileSync(fileURLToPath(new URL(`../${rel}`, import.meta.url)), 'utf8');
   for (const name of ['LICENSE', 'NOTICE']) assert.equal(top(`plugins/banzai/${name}`), top(name), name);
   assert.ok(top('README.md').includes(`claude plugin install ${id}`));
+  // The manifest, the README and CI name one oldest supported Claude Code.
+  const oldest = /^>=(\d+\.\d+\.\d+)$/.exec(manifest('../plugins/banzai/.claude-plugin/plugin.json').engines['claude-code'])[1];
+  assert.ok(top('README.md').includes(`Claude Code ${oldest} or later`));
+  assert.ok(top('.github/workflows/ci.yml').includes(`@anthropic-ai/claude-code@${oldest}\n`));
 });
 
 test('outside a Git repository shell changes are not seen', () => {

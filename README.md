@@ -69,6 +69,23 @@ continues a work from them, and they need no plugin to be read.
   type it; `/banzai:auto` has its plan and its finished change reviewed
   without being asked.
 
+### When a work is finished
+
+A finished work stays in `documentation/work/`: it is the record of what
+was asked, built and checked. No command archives or removes one. A command
+opens an old work only when you name it or when an epic's tracker links to
+it, and at session start the hook names only the newest ones.
+
+When the directory gets long, delete the works you no longer need. Their
+names start with the date, so the oldest come first, and what you committed
+stays in Git's history. Two things are worth keeping:
+
+- the decision records. They live in `documentation/decisions/`, apart
+  from the works, and later work is planned and checked against them;
+- the works of an epic that is still running. Its tracker links to each
+  package's work, and `/banzai:epic next` reports a link that leads
+  nowhere.
+
 ## Two ways to supervise
 
 You pick one for each task by the command you type.
@@ -427,6 +444,9 @@ claude plugin uninstall banzai@parabolic-plugins --scope project --keep-data
   protected against a model that works to get around it.
 - It does not see changes to files that Git ignores, changes in a project
   outside Git, or changes a background process makes after its command ended.
+- It does not find a change made by a shell command or an MCP call that you
+  cancel with `Esc` while it runs: Claude Code reports nothing to a hook
+  after a cancelled call. Look at `git status` after you cancel one.
 - Each shell or MCP call takes about 80 ms longer on a small repository, and
   an estimated 150 ms on one with 7,000 files. After `/banzai:auto`, and
   after `/banzai:fix` while no planned work is attached, the session may

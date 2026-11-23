@@ -163,6 +163,10 @@ test('the approval command must be the whole command, on one line', () => {
   }
   assert.equal(shell(root, 'grep -r banzai-request-approval .').decision, null);
   assert.equal(shell(root, 'ls').decision, null);
+  // Only the shell runs the command: another tool's input is not read as one.
+  const other = pre(root, 'mcp__shell__run', { command: `${COMMAND} demo` });
+  assert.equal(other.decision, null);
+  post(root, 'mcp__shell__run', { command: `${COMMAND} demo` }, other.id);
   assert.equal(fs.existsSync(path.join(root, '.banzai/approvals')), false, 'nothing was approved');
 });
 
@@ -172,6 +176,10 @@ test('the approval command needs a real work directory with a plan', () => {
   fs.symlinkSync(path.join(root, 'src'), path.join(root, 'documentation/work/link'));
   put(root, 'src/plan.md', '# Not a plan\n');
   assert.match(shell(root, `${COMMAND} missing`).reason, /not a work directory/);
+  // A name in Cyrillic letters: the refusal says which letters a name may hold.
+  const cyrillic = '261123-експорт-csv';
+  put(root, `documentation/work/${cyrillic}/plan.md`, '# Plan\n' + SUMMARY);
+  assert.match(shell(root, `${COMMAND} ${cyrillic}`).reason, /not a work directory.* may hold ASCII letters/);
   assert.match(shell(root, `${COMMAND} ../../src`).reason, /not a work directory/);
   assert.match(shell(root, `${COMMAND} link`).reason, /not a work directory/);
   assert.match(shell(root, `${COMMAND} empty`).reason, /has no plan/);

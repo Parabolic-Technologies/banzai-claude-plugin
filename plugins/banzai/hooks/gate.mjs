@@ -138,8 +138,8 @@ function onSessionStart(payload, root, session) {
   ].join('\n'));
 }
 
-// A typed entry command starts the session's work over. Only `feature` can
-// name an existing work, and naming it is the developer's word for it.
+// A typed entry command starts the session's work over; changes that wait
+// stay. Only `feature` can name an existing work: the developer's word for it.
 function onExpansion(payload, root) {
   const entry = payload.command_source === 'plugin' ? ENTRY_COMMANDS[payload.command_name] : null;
   if (!entry) return null;
@@ -148,7 +148,7 @@ function onExpansion(payload, root) {
   const first = String(payload.command_args || '').trim().split(/\s+/)[0];
   const plain = first.replace(/^[`'"]+|[`'",.;:]+$/g, '').replace(/^(\.\/)?documentation\/work\//, '').replace(/\/+$/, '');
   const work = (entry === 'feature' && [first, plain].find((name) => isWork(root, name))) || null;
-  updateSession(payload.session_id, (session) => Object.assign(session, { entry, work, cleared: work, unapproved: [] }));
+  updateSession(payload.session_id, (session) => Object.assign(session, { entry, work, cleared: work }));
   return null;
 }
 
@@ -174,7 +174,7 @@ function onFileWrite(payload, root, session) {
 // developer's answer to it will mean.
 function approvalStep(root, session, work) {
   const refuse = (text) => ({ refusal: decision('deny', text) });
-  if (!isWork(root, work)) return refuse(`"${work}" is not a work directory under documentation/work/. Its name may hold letters, digits, ".", "_" and "-", and it must be a real directory, not a link. Use the directory's name: ${approvalCommand('<work>')}`);
+  if (!isWork(root, work)) return refuse(`"${work}" is not a work directory under documentation/work/. Its name may hold ASCII letters, digits, ".", "_" and "-", and it must be a real directory, not a link. Use the directory's name: ${approvalCommand('<work>')}`);
   const files = bundle(root, work);
   if (!files) return refuse(`Work "${work}" has no plan. Write documentation/work/${work}/plan.md first, then run: ${approvalCommand(work)}`);
   if (session.entry !== 'auto' && session.work === work && standing(root, session).ok) {

@@ -41,7 +41,12 @@ export function run(root, payload, extra = {}) {
   return result.stdout ? JSON.parse(result.stdout) : null;
 }
 
-export const hook = (root, payload, extra) => (run(root, payload, extra) || {}).hookSpecificOutput || null;
+// Every answer names the event it answers.
+export function hook(root, payload, extra) {
+  const out = (run(root, payload, extra) || {}).hookSpecificOutput || null;
+  if (out) assert.equal(out.hookEventName, payload.hook_event_name);
+  return out;
+}
 
 export const pre = (root, tool_name, tool_input, fields = {}, extra) => {
   const tool_use_id = 'tool_use_id' in fields ? fields.tool_use_id : `t${++counter}`;

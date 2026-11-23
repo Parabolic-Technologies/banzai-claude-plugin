@@ -155,6 +155,24 @@ test('"Yes" accepts what the dialog showed, not what was added since', () => {
   assert.doesNotMatch(next.reason, /src\/early\.js/);
 });
 
+test('"Yes" leaves a change that another call reported while the dialog was open', () => {
+  const root = gitRepo('demo');
+  entry(root, 'banzai:feature', 'demo');
+  const slow = shell(root, 'slow');
+  call(root, () => put(root, 'src/early.js', 'x\n'));
+  // The slow call made it before the question, so the asked call's own
+  // comparison does not find it.
+  put(root, 'src/late.js', 'x\n');
+  const asked = shell(root, 'ls');
+  assert.doesNotMatch(asked.reason, /src\/late\.js/);
+  post(root, 'Bash', {}, slow.id);
+  post(root, 'Bash', {}, asked.id);
+  const next = shell(root, 'ls');
+  assert.equal(next.decision, 'ask');
+  assert.match(next.reason, /src\/late\.js/);
+  assert.doesNotMatch(next.reason, /src\/early\.js/);
+});
+
 test('the developer is told when a change is detected', () => {
   const root = gitRepo('demo');
   entry(root, 'banzai:feature', 'demo');

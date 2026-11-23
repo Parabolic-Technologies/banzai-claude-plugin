@@ -37,10 +37,12 @@ next.
 
 Otherwise start new work. Name it `<YYMMDD>-<subject>`: today's date and two
 to five lowercase words joined by hyphens, such as `261118-export-as-csv`.
-Read the code, the tests and the project's `CLAUDE.md` or `AGENTS.md` that
-the request touches before you write anything. Note the commit the work
-starts from (`git rev-parse --short HEAD`) and whether the working tree
-already has changes of its own (`git status --short`).
+Use ASCII letters and digits only, whatever language the request is in: the
+hook does not recognise a work under another name. Read the code, the tests
+and the project's `CLAUDE.md` or `AGENTS.md` that the request touches before
+you write anything. Note the commit the work starts from
+(`git rev-parse --short HEAD`) and whether the working tree already has
+changes of its own (`git status --short`).
 
 ## 2. Fit and questions
 

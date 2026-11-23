@@ -4,6 +4,25 @@ All notable changes to the Banzai plugin are listed here. Versions follow
 [Semantic Versioning](https://semver.org/). A change to a command name, to
 the hook's decisions or to the document layout is a breaking change.
 
+## 1.2.2 - 2026-11-23
+
+### Changed
+
+- The plugin's manifest declares Claude Code 2.1.327 or later, the minimum
+  the README already names.
+- The README says what to do with finished works, and that a change made
+  by a shell command or an MCP call you cancel with `Esc` is not found.
+
+### Fixed
+
+- A typed `/banzai:feature`, `/banzai:fix` or `/banzai:auto` no longer
+  drops the source changes that wait for your acceptance. After
+  `/banzai:feature` the hook still asks about them; where changes pass, as
+  after `/banzai:fix`, they are dropped at the next call.
+- `/banzai:feature` and `/banzai:auto` name a new work with ASCII letters
+  and digits only, so a request in another language no longer yields a
+  work the hook does not recognise.
+
 ## 1.2.1 - 2026-11-23
 
 ### Changed

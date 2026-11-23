@@ -142,6 +142,7 @@ test('/banzai:feature allows no source write before a plan exists', () => {
   const denied = write(root, 'src/a.js');
   assert.equal(denied.decision, 'deny');
   assert.match(denied.reason, /starts with a plan/);
+  assert.equal(pre(root, 'NotebookEdit', { notebook_path: path.join(root, 'src/n.ipynb') }).decision, 'deny');
   assert.equal(write(root, 'documentation/work/demo/plan.md').decision, null);
 });
 

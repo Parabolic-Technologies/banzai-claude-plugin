@@ -24,12 +24,14 @@ graders:
     type: regex
     target: { source: file, path: src/greet.mjs }
     pattern: '^(?:[^\n]*\n){0,518}[^\n]*\n?$'
-  # The trace is one message per line: a file tool wrote the flag into a
-  # file under src/, the large one or a new one.
+  # The trace is one message per line: a file tool, or a shell command that
+  # redirects into src/, wrote the flag into a file under src/, the large
+  # one or a new one. Sonnet wrote it with a shell heredoc in both runs of
+  # 2026-11-23.
   - name: flag-written-to-source
     type: regex
     target: trace
-    pattern: '"type":\s*"tool_use"[^\n]*"name":\s*"(Write|Edit)"[^\n]*"file_path":\s*"[^"]*/src/[^"]*"[^\n]*shout'
+    pattern: '"type":\s*"tool_use"[^\n]*("name":\s*"(Write|Edit)"[^\n]*"file_path":\s*"[^"]*/src/[^"]*"|"name":\s*"Bash"[^\n]*>\s*(\./)?src/)[^\n]*shout'
   # A flag written only into a new file that nothing loads is not built: the
   # large file handles the flag itself or loads another module.
   - name: large-file-reaches-the-flag

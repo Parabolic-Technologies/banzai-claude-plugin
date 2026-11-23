@@ -95,11 +95,22 @@ the host reports the call afterwards under the same id. `Monitor` and
 `PowerShell` are still denied and sent to the shell, because their dialogs
 were not seen. Not checked: the desktop app's dialog for an MCP tool, and
 the mode `bypassPermissions`.
+Since 2026-11-23 a typed entry command keeps the list of unaccepted changes.
+After `/banzai:feature` they keep asking; in a session whose changes pass, as
+after `/banzai:fix`, the next call drops them. Before, the command emptied the
+list, and a developer who typed `/banzai:feature` again without having seen
+the hook's notice was never asked.
 Cost: about 80 ms per call on a small repository, and an estimated 130 to
 160 ms on one with 7,000 tracked files. Where the call is not compared it is
 about 30 ms less on a small repository and about 50 ms less with 7,000
 tracked files, measured on 2026-11-21. Not seen: projects outside
-Git, ignored files, and changes by background processes after the call ends.
+Git, ignored files, changes by background processes after the call ends, and
+a call the developer cancels with `Esc` while it runs. The host reports
+nothing to a hook after a cancelled call, so the call is never compared.
+Seen on 2026-11-23 on Claude Code 2.1.330 for a shell command, after which
+the model said the command had not run; not checked for an MCP call.
+Comparing such a call later needs a way to tell it from a call that still
+runs in parallel, and none is built.
 Rejected: asking before every shell command; parsing commands for writes;
 hashing every tracked file; letting MCP calls pass while a change is
 unaccepted, which leaves nothing to stop a tool that edits source through

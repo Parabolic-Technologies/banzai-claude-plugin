@@ -41,8 +41,10 @@ you change source.
 
 Otherwise start new work. Name it `<YYMMDD>-<subject>`: today's date and two
 to five lowercase words joined by hyphens, such as `261118-export-as-csv`.
-Read the code, the tests and the project's `CLAUDE.md` or `AGENTS.md` that
-the request touches before you write anything.
+Use ASCII letters and digits only, whatever language the request is in: the
+hook does not recognise a work under another name. Read the code, the tests
+and the project's `CLAUDE.md` or `AGENTS.md` that the request touches before
+you write anything.
 
 ## 2. Requirements
 

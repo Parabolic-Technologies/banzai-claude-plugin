@@ -1,6 +1,6 @@
 {
   "name": "banzai",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Spec-driven development for Claude Code with a human in the loop or on the loop: slash commands that keep requirements, plans, reports and an independent code review as Markdown in your project. Approve the plan with one click before the code, or let planned work run to its end and read the report. A guardrail hook holds Claude's file edits to source code until the plan is approved.",
   "author": {
     "name": "Alexander Torosh",
@@ -9,6 +9,9 @@
   "homepage": "https://github.com/Parabolic-Technologies/banzai-claude-plugin",
   "repository": "https://github.com/Parabolic-Technologies/banzai-claude-plugin",
   "license": "Apache-2.0",
+  "engines": {
+    "claude-code": ">=2.1.327"
+  },
   "keywords": [
     "spec-driven-development",
     "human-in-the-loop",
